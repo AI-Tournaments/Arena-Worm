@@ -12,14 +12,15 @@ onmessage = messageEvent => {
 	if(messageEvent.data.settings.arena.threeDimensions){
 		postAbort('', '`threeDimensions` is currently not supported.');
 	}else{
-	new Participants(messageEvent.data, ()=>{
-		onmessage = messageEvent => {
-			if(messageEvent.data === 'Start'){
-				/* Ready. Set. Go! */;
+		new Participants(messageEvent.data, ()=>{
+			onmessage = messageEvent => {
+				if(messageEvent.data === 'Start'){
+					/* Ready. Set. Go! */;
+				}
 			}
-		}
-		postMessage({type: 'Ready-To-Start', message: null});
-	}, error => {
-		postAbort('Did-Not-Start', error);
-	}, (participantName, error) => postAbort(participantName, error));
+			postMessage({type: 'Ready-To-Start', message: null});
+		}, error => {
+			postAbort('Did-Not-Start', error);
+		}, (participantName, error) => postAbort(participantName, error));
+	}
 }
