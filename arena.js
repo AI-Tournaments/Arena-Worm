@@ -9,6 +9,9 @@ function postAbort(participant='', error=''){
 	postMessage({type: 'Aborted', message: {participantName: participantName, error: error}})
 }
 onmessage = messageEvent => {
+	if(messageEvent.data.settings.arena.threeDimensions){
+		postAbort('', '`threeDimensions` is currently not supported.');
+	}else{
 	new Participants(messageEvent.data, ()=>{
 		onmessage = messageEvent => {
 			if(messageEvent.data === 'Start'){
