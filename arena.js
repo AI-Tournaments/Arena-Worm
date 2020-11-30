@@ -1,5 +1,5 @@
 'use strict'
-importScripts('https://ai-tournaments.github.io/AI-Tournaments/Arena/participants.js');
+importScripts('https://ai-tournaments.github.io/AI-Tournaments/Arena/Participants.js');
 importScripts('https://chrisacrobat.github.io/js-compilation/CreateWorkerFromRemoteURL.js');
 function postDone(participants, log){
 	postMessage({type: 'Done', message: {score: participants.getScores(), settings: participants.getSettings(), log: log}});
