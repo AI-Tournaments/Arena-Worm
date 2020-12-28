@@ -1,6 +1,4 @@
 'use strict'
-importScripts('https://ai-tournaments.github.io/AI-Tournaments/Arena/Participants.js');
-importScripts('https://chrisacrobat.github.io/js-compilation/CreateWorkerFromRemoteURL.js');
 let arena;
 let coordinate_end;
 let coordinate_middle;
@@ -8,7 +6,6 @@ let participants;
 let settings;
 let worms = [];
 let _log = [];
-let _locked = false;
 class Direction{
 	static #UP = new Direction();
 	static #DOWN = new Direction();
@@ -19,55 +16,70 @@ class Direction{
 	static getLeft = ()=>this.#LEFT;
 	static getRight = ()=>this.#RIGHT;
 }
-class placeable{
-	constructor(square=null){
-		let currentSquare = square;
-		this.#checkCurrentSquare = ()=>{
-			if(currentSquare === null && this.constructor.name === 'SolidWorm'){
-				throw new Error('SolidWorm has to be placed.');
+class Placeable{
+	constructor(space=null){
+		let currentSpace = space;
+		this.getSpace = ()=>{
+			return currentSpace;
 			}
+		this.setSquare = space=>{
+			currentSpace = space;
 		}
-		this.getSquare = ()=>{
-			this.#checkCurrentSquare();
-			return currentSquare;
+		}
+	}
+class Eatable extends Placeable{
+	constructor(space=null){
+		super(space);
+}
+}
+class Controllable extends Placeable{
+	constructor(body, space=null){
+		super(space);
+		if(this.constructor.name === 'Controllable'){
+			throw new Error('Controllable not.');
+		}
+		const BODY = body;
+		if(this.constructor.name === 'SolidWorm'){
+			BODY.push(this);
+		}
+		this.getPlace = () => {
+			return BODY.indexOf(this);
+		}
+		this.getTeam = ()=>{
+			return BODY[0].getTeamNumber();
 		}
 	}
 }
-class SolidWorm extends placeable{
+class SolidWorm extends Controllable{
 	constructor(team=-1, direction=new Direction()){
-		const BODY = new Array(this);
-		let _team = team;
-		super();
+		super(new Array());
 		this.direction = direction;
 		this.extendBody = ()=>{
 			BODY.push(new TrailingBody(BODY));
 		}
-		this.getTeam = ()=>{
-			return _team;
-		}
-		this.move = nextSquare=>{
-			let square;
+		this.move = nextSpace=>{
+			let space;
 			BODY.forEach(part=>{
-				square = part.getSquare();
-				nextSquare.occupiedBy = part;
-				nextSquare = square;
+				space = part.getSpace();
+				nextSpace.setOccupiedBy(part);
+				nextSpace = space;
 			});
-			square.occupiedBy = null;
+			space.setOccupiedBy(null);
 		}
 		this.getParticipant = ()=>{
-			return participants.get(_team, 0);
+			return participants.get(team, 0);
 		}
+		this.getTeamNumber = ()=>team;
+		this.kill = ()=>{
+			console.error('Not implemented yet.');
+		};
 	}
 }
-class TrailingBody extends placeable{
+class TrailingBody extends Controllable{
 	constructor(body){
-		const BODY = body;
-		super();
-		this.getPlace = () => {
-			return BODY.indexOf(this);
+		super(body);
 		}
 	}
-}
 class Space{
 	constructor(){
 		const CHALLENGERS = new Array()
@@ -79,6 +91,11 @@ class Space{
 		}
 		this.isSingleChallenger = ()=>{
 			return CHALLENGERS.length === 1;
+		}
+		this.killChallengers = ()=>{
+			for(let solidWorm in CHALLENGERS){
+				solidWorm.kill();
+			}
 		}
 		this.moveChallenger = ()=>{
 			if(this.isSingleChallenger()){
@@ -92,16 +109,13 @@ class Space{
 				throw new Error('Challenger is not alone.');
 			}
 		}
+		this.getOccupiedBy = ()=>occupiedBy;
 		this.setOccupiedBy = solidWorm=>{
-			if(_locked){
-				throw new Error('Set .occupiedBy is locked, only .moveChallenger() is available.');
-			}else{
-				this.occupiedBy = solidWorm;
-				solidWorm.currentSquare = this;
+			occupiedBy = solidWorm;
+			solidWorm.setSquare(this);
 			}
 		}
 	}
-}
 function log(type='', value, raw=false){
 	_log.push({type: type, value: raw ? value : JSON.parse(JSON.stringify(value))});
 }
@@ -110,7 +124,8 @@ function callbackError(participant, messageEvent){
 	console.error(messageEvent);
 }
 function callback(participant, messageEvent){
-	updateDirection(participant, messageEvent.data);
+	participant.payload.response = messageEvent.data;
+	updateDirection(participant);
 	let missingResponse = false;
 	worms.forEach(solidWorm => {
 		missingResponse |= solidWorm.getParticipant().payload.response === null;
@@ -118,56 +133,83 @@ function callback(participant, messageEvent){
 	if(missingResponse){
 		return;
 	}
-	let parkerSquare = [];
+	let challengedSpaces = [];
+	let borderCollisions = [];
 	worms.forEach(solidWorm => {
 		let pos = getPos(solidWorm);
 		let posNext = getNextPos(pos, solidWorm.direction);
-		let space = arena[posNext[0], posNext[1]];
-		if(space.occupiedBy === null || space.willBeUnoccupied()){
+		if(posNext === null){
+			borderCollisions.push(solidWorm);
+		}else{
+			let space = arena[posNext[0]][posNext[1]];
 			space.addChallenger(solidWorm);
-			if(!parkerSquare.includes(space)){
-				parkerSquare.push(space);
+			if(!challengedSpaces.includes(space)){
+				challengedSpaces.push(space);
 			}
 		}
 	});
-	for(let square in parkerSquare){
-		if(square.isSingleChallenger()){
-			square.moveChallenger();
+	borderCollisions.forEach(solidWorm => {
+		solidWorm.kill();
+	});
+	challengedSpaces.forEach(space => {
+		if(space.isSingleChallenger() && space.willBeUnoccupied()){
+			space.moveChallenger();
+		}else{
+			space.killChallengers();
 		}
-	}
+	});
 	tick();
 }
 function getPos(solidWorm){
 	for(let x = 0; x < arena.length; x++){
 		let array = arena[x];
-		for(let y = 0; y < array; y++){
-			if(solidWorm === object){
+		for(let y = 0; y < array.length; y++){
+			if(solidWorm === array[y].getOccupiedBy()){
 				return [x, y];
 			}
 		}
 	}
 }
 function getNextPos(pos, direction){
+	switch(direction){
+		case Direction.getUp():
+			pos = [pos[0], pos[1]+1];
+			break;
+		case Direction.getDown():
+			pos = [pos[0], pos[1]-1];
+			break;
+		case Direction.getLeft():
+			pos = [pos[0]-1, pos[1]];
+			break;
+		case Direction.getRight():
+			pos = [pos[0]+1, pos[1]];
+			break;
+	}
+	let a = pos[0] < 0;
+	let b = settings.arena.size <= pos[0];
+	let c = pos[1] < 0;
+	let d = settings.arena.size <= pos[1];
+	if(a || b || c || d){
 	if(settings.arena.noBorder){
-		switch(direction){
-			case Direction.getUp(): ; break;
-			case Direction.getDown(): ; break;
-			case Direction.getLeft(): ; break;
-			case Direction.getRight(): ; break;
+			if(a){
+				pos[0] = settings.arena.size-1;
+			}else if(b){
+				pos[0] = 0;
+			}else if(c){
+				pos[1] = settings.arena.size-1;
+			}else if(d){
+				pos[1] = 0;
 		}
 	}else{
-		switch(direction){
-			case Direction.getUp(): ; break;
-			case Direction.getDown(): ; break;
-			case Direction.getLeft(): ; break;
-			case Direction.getRight(): ; break;
+			return null;
 		}
 	}
+	return pos;
 }
-function updateDirection(participant, choice){
+function updateDirection(participant){
 	let nextDirection = null;
 	let solidWorm = participant.payload.worm;
-	switch(choice){
+	switch(participant.payload.response){
 		case 0:
 			nextDirection = solidWorm.direction; break;
 		case -1:
@@ -188,16 +230,26 @@ function updateDirection(participant, choice){
 			break;
 	}
 	if(nextDirection === null){
-		log('error', solidWorm.getTeam() + ' Faulty direction, default to forward.');
-	}
+		log('error', solidWorm.getTeam() + ' Faulty direction, keep previous.');
+	}else{
 	solidWorm.direction = nextDirection;
+	}
 }
 function tick(){
 	log('tick', arena);
 	worms.forEach(solidWorm => {
 		solidWorm.getParticipant().payload.response = null;
 	});
-	participants.postToAll(arena);
+	let _arena = [];
+	arena.forEach(column => {
+		let _column = [];
+		_arena.push(_column);
+		column.forEach(square => {
+			let occupiedBy = square.getOccupiedBy();
+			_column.push({occupiedBy: occupiedBy === null ? null : {team: occupiedBy.getTeam(), head: occupiedBy.constructor.name === 'SolidWorm'}});
+		});
+	});
+	participants.postToAll(_arena);
 }
 function postDone(participants, log){
 	log('tick', arena);
@@ -208,6 +260,7 @@ function postAbort(participant='', error=''){
 	postMessage({type: 'Aborted', message: {participantName: participantName, error: error}})
 }
 onmessage = messageEvent => {
+	importScripts(messageEvent.data.ArenaHelper_url);
 	settings = messageEvent.data.settings;
 	if(messageEvent.data.participants.length%2 !== 0){
 		postAbort('', 'Uneven amount of teams is not supported.');
@@ -216,7 +269,15 @@ onmessage = messageEvent => {
 	}else if(settings.arena.threeDimensions){
 		postAbort('', '`threeDimensions` is currently not supported.');
 	}else{
-		arena = new Array(settings.arena.size).fill(new Array(settings.arena.size).fill(new Space()));
+		arena = [];
+		while(arena.length < settings.arena.size){
+			let column = [];
+			while(column.length < settings.arena.size){
+				column.push(new Space());
+			}
+			arena.push(column);
+		}
+		
 		coordinate_end = settings.arena.size-1;
 		coordinate_middle = Math.floor(coordinate_end/2);
 
@@ -237,8 +298,7 @@ onmessage = messageEvent => {
 			arena[coordinate_end][coordinate_middle].setOccupiedBy(solidWorm);
 			worms.push(solidWorm);
 		}
-		_locked = true;
-		participants = new Participants(messageEvent.data, ()=>{
+		participants = new ArenaHelper.Participants(messageEvent.data, ()=>{
 			worms.forEach(solidWorm => {
 				solidWorm.getParticipant().payload.worm = solidWorm;
 			});
