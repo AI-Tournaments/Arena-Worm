@@ -1,8 +1,8 @@
 {
 	"header": {
 		"limits": {
-			"participants": {"min": 2, "max": 4},
-			"teams": {"min": 2, "max": 4},
+			"participants": {"min": 2, "max": 6},
+			"teams": {"min": 2, "max": 6},
 			"participantsPerTeam": {"min": 1, "max": 1}
 		},
 		"settings": {
