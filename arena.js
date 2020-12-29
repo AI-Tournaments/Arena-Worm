@@ -6,7 +6,6 @@ let participants;
 let settings;
 let worms = [];
 let worms_lastLength;
-let _log = [];
 class Direction{
 	static #UP = new Direction();
 	static #DOWN = new Direction();
@@ -159,9 +158,6 @@ class Space{
 		}
 	}
 }
-function log(type='', value, raw=false){
-	_log.push({type: type, value: raw ? value : JSON.parse(JSON.stringify(value))});
-}
 function callbackError(participant, messageEvent){
 	console.error(participant);
 	console.error(messageEvent);
@@ -211,7 +207,8 @@ function callback(participant, messageEvent){
 	if(0 < worms.length){
 		tick();
 	}else{
-		postDone();
+		ArenaHelper.log('tick', parseArena());
+		ArenaHelper.postDone();
 	}
 }
 function getPos(solidWorm){
@@ -284,7 +281,7 @@ function updateDirection(participant){
 			break;
 	}
 	if(nextDirection === null){
-		log('error', solidWorm.getTeam() + ' Faulty direction, keep previous.');
+		ArenaHelper.log('error', solidWorm.getTeam() + ' Faulty direction, keep previous.');
 	}else{
 		solidWorm.direction = nextDirection;
 	}
@@ -303,33 +300,25 @@ function parseArena(){
 }
 function tick(){
 	let parsedArena = parseArena();
-	log('tick', parsedArena);
+	ArenaHelper.log('tick', parsedArena);
 	worms.forEach(solidWorm => {
 		solidWorm.getParticipant().payload.response = null;
 	});
 	participants.postToAll(parsedArena);
 }
-function postDone(){
-	log('tick', parseArena());
-	postMessage({type: 'Done', message: {score: participants.getScores(), settings: participants.getSettings(), log: _log}});
-}
-function postAbort(participant='', error=''){
-	let participantName = participant.name === undefined ? participant : participant.name;
-	postMessage({type: 'Aborted', message: {participantName: participantName, error: error}})
-}
 onmessage = messageEvent => {
 	importScripts(messageEvent.data.ArenaHelper_url);
 	settings = messageEvent.data.settings;
 	if(messageEvent.data.participants.length%2 !== 0){
-		postAbort('', 'Uneven amount of teams is not supported.');
+		ArenaHelper.postAbort('', 'Uneven amount of teams is not supported.');
 	}else if(settings.arena.size%2 !== 1){
-		postAbort('', 'Arena size has to be uneven.');
+		ArenaHelper.postAbort('', 'Arena size has to be uneven.');
 	}else if(settings.rules.winner === 'MostPoints' && settings.rules.defeatedWorms !== 'Solid'){
-		postAbort('', 'Incompatible rules: MostPoints can only be played with Solid.');
+		ArenaHelper.postAbort('', 'Incompatible rules: MostPoints can only be played with Solid.');
 	}else if(!settings.arena.threeDimensions && 4 < messageEvent.data.participants.length){
-		postAbort('', '`threeDimensions` is required for more than 4 participants.');
+		ArenaHelper.postAbort('', '`threeDimensions` is required for more than 4 participants.');
 	}else if(settings.arena.threeDimensions){
-		postAbort('', '`threeDimensions` is currently not supported.');
+		ArenaHelper.postAbort('', '`threeDimensions` is currently not supported.');
 	}else{
 		arena = [];
 		while(arena.length < settings.arena.size){
@@ -373,7 +362,7 @@ onmessage = messageEvent => {
 			}
 			postMessage({type: 'Ready-To-Start', message: null});
 		}, error => {
-			postAbort('Did-Not-Start', error);
-		}, (participantName, error) => postAbort(participantName, error));
+			ArenaHelper.postAbort('Did-Not-Start', error);
+		}, (participantName, error) => ArenaHelper.postAbort(participantName, error));
 	}
 }
