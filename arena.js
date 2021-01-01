@@ -114,41 +114,36 @@ class Space{
 		const CHALLENGERS = new Array()
 		let occupiedBy = null;
 		let eatable = 0;
+		function willBeUnoccupied(){
+			return occupiedBy === null ? true : occupiedBy.getLength()-1 === occupiedBy.getPlace();
+		}
 		this.addEatable = ()=>{
 			eatable++;
-		}
-		this.willBeUnoccupied = ()=>{
-			return occupiedBy === null ? true : occupiedBy.getLength()-1 === occupiedBy.getPlace();
 		}
 		this.addChallenger = solidWorm=>{
 			CHALLENGERS.push(solidWorm);
 		}
-		this.isSingleChallenger = ()=>{
-			return CHALLENGERS.length === 1;
-		}
-		this.killChallengers = ()=>{
+		this.executeChallenge = ()=>{
+			let _willBeUnoccupied = willBeUnoccupied();
 			CHALLENGERS.forEach(solidWorm => {
-				solidWorm.kill();
-			});
-		}
-		this.clearChallengers = ()=>{
-			while(CHALLENGERS.length){
-				CHALLENGERS.pop();
-			}
-		}
-		this.moveChallenger = ()=>{
-			if(this.isSingleChallenger()){
-				let solidWorm = CHALLENGERS[0];
+				if(_willBeUnoccupied){
 				if(settings.rules.winner === 'MostPoints'){
 					participants.addScore(solidWorm.getTeam(), eatable);
 				}
+					if(CHALLENGERS.length === 1){
 				while(0 < eatable){
 					eatable--;
 					solidWorm.extendBody();
 				}
+					}
 				solidWorm.move(this);
-			}else{
-				throw new Error('Challenger is not alone.');
+				}
+				if(1 < CHALLENGERS.length || !_willBeUnoccupied){
+					solidWorm.kill();
+				}
+			});
+			while(CHALLENGERS.length){
+				CHALLENGERS.pop();
 			}
 		}
 		this.getOccupiedBy = ()=>occupiedBy;
@@ -196,12 +191,7 @@ function callback(participant, messageEvent){
 		solidWorm.kill();
 	});
 	challengedSpaces.forEach(space => {
-		if(space.isSingleChallenger() && space.willBeUnoccupied()){
-			space.moveChallenger();
-		}else{
-			space.killChallengers();
-		}
-		space.clearChallengers();
+		space.executeChallenge();
 	});
 	if(settings.rules.winner === 'LastWormStanding' && worms_lastLength !== worms.length){
 		worms.forEach(solidWorm => {
