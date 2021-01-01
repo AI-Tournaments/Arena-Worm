@@ -70,13 +70,13 @@ class SolidWorm extends Controllable{
 			BODY.forEach(part=>{
 				space = part.getSpace();
 				if(nextSpace !== null){
-				nextSpace.setOccupiedBy(part);
+					nextSpace.setOccupiedBy(part);
 				}
 				nextSpace = space;
 			});
 			if(space !== null){
-			space.setOccupiedBy(null);
-		}
+				space.setOccupiedBy(null);
+			}
 		}
 		this.getParticipant = ()=>{
 			return participants.get(team, 0);
@@ -127,16 +127,16 @@ class Space{
 			let _willBeUnoccupied = willBeUnoccupied();
 			CHALLENGERS.forEach(solidWorm => {
 				if(_willBeUnoccupied){
-				if(settings.rules.winner === 'MostPoints'){
-					participants.addScore(solidWorm.getTeam(), eatable);
-				}
-					if(CHALLENGERS.length === 1){
-				while(0 < eatable){
-					eatable--;
-					solidWorm.extendBody();
-				}
+					if(settings.rules.winner === 'MostPoints'){
+						participants.addScore(solidWorm.getTeam(), eatable);
 					}
-				solidWorm.move(this);
+					if(CHALLENGERS.length === 1){
+						while(0 < eatable){
+							eatable--;
+							solidWorm.extendBody();
+						}
+					}
+					solidWorm.move(this);
 				}
 				if(1 < CHALLENGERS.length || !_willBeUnoccupied){
 					solidWorm.kill();
@@ -297,9 +297,19 @@ function tick(){
 	let parsedArena = parseArena();
 	ArenaHelper.log('tick', parsedArena);
 	worms.forEach(solidWorm => {
-		solidWorm.getParticipant().payload.response = null;
+		let arenaClone = JSON.parse(JSON.stringify(parsedArena));
+		switch(solidWorm.getTeam()){
+			default: case 0: break;
+			case 1:
+				for(let index = 0; index < arenaClone.length; index++){
+					arenaClone[index] = arenaClone[index].reverse();
+				}
+				break;
+		}
+		let participant = solidWorm.getParticipant();
+		participant.payload.response = null;
+		participant.postMessage(arenaClone);
 	});
-	participants.postToAll(parsedArena);
 }
 onmessage = messageEvent => {
 	importScripts(messageEvent.data.ArenaHelper_url);
