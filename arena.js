@@ -351,11 +351,11 @@ onmessage = messageEvent => {
 		worms.push(solidWorm);
 
 		if(2 < messageEvent.data.participants.length){
-			solidWorm = new SolidWorm(2, Direction.getLeft())
+			solidWorm = new SolidWorm(2, Direction.getRight())
 			arena[0][coordinate_middle].setOccupiedBy(solidWorm);
 			worms.push(solidWorm);
 
-			solidWorm = new SolidWorm(3, Direction.getRight())
+			solidWorm = new SolidWorm(3, Direction.getLeft())
 			arena[coordinate_end][coordinate_middle].setOccupiedBy(solidWorm);
 			worms.push(solidWorm);
 		}
