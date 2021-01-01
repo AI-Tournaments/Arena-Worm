@@ -302,8 +302,13 @@ function tick(){
 			default: case 0: break;
 			case 1:
 				for(let index = 0; index < arenaClone.length; index++){
-					arenaClone[index] = arenaClone[index].reverse();
+					arenaClone[index].reverse();
 				}
+				break;
+			case 3:
+				arenaClone.reverse();
+			case 2:
+				arenaClone = arenaClone[0].map((x, xIndex) => arenaClone.map(y => y[xIndex]));
 				break;
 		}
 		let participant = solidWorm.getParticipant();
