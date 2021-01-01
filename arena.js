@@ -53,7 +53,7 @@ class SolidWorm extends Controllable{
 		const BODY = new Array();
 		super(BODY);
 		this.direction = direction;
-		function checkIfAlive(){
+		function getWormIndex(){
 			let index = worms.indexOf(this);
 			if(index !== -1){
 				throw new Error('SolidWorm is dead.');
@@ -61,25 +61,29 @@ class SolidWorm extends Controllable{
 			return index;
 		}
 		this.extendBody = ()=>{
-			checkIfAlive();
+			getWormIndex();
 			BODY.push(new TrailingBody(BODY));
 		}
 		this.move = nextSpace=>{
-			checkIfAlive();
+			getWormIndex();
 			let space;
 			BODY.forEach(part=>{
 				space = part.getSpace();
+				if(nextSpace !== null){
 				nextSpace.setOccupiedBy(part);
+				}
 				nextSpace = space;
 			});
+			if(space !== null){
 			space.setOccupiedBy(null);
+		}
 		}
 		this.getParticipant = ()=>{
 			return participants.get(team, 0);
 		}
 		this.getTeamNumber = ()=>team;
 		this.kill = ()=>{
-			worms.splice(checkIfAlive(), 1);
+			worms.splice(getWormIndex(), 1);
 			BODY.forEach(part=>{
 				let space = part.getSpace();
 				let occupiedBy;
@@ -97,6 +101,7 @@ class SolidWorm extends Controllable{
 				space.setOccupiedBy(occupiedBy);
 			});
 		};
+		this.isAlive = ()=>worms.includes(this);
 	}
 }
 class TrailingBody extends Controllable{
