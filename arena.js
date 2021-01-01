@@ -22,7 +22,7 @@ class Placeable{
 		this.getSpace = ()=>{
 			return currentSpace;
 		}
-		this.setSquare = space=>{
+		this.setSpace = space=>{
 			currentSpace = space;
 		}
 	}
@@ -155,7 +155,7 @@ class Space{
 		this.setOccupiedBy = solidWorm=>{
 			occupiedBy = solidWorm;
 			if(solidWorm !== null){
-				solidWorm.setSquare(this);
+				solidWorm.setSpace(this);
 			}
 		}
 		this.getEatable = ()=>{
@@ -291,8 +291,8 @@ function parseArena(){
 	arena.forEach(column => {
 		let _column = [];
 		_arena.push(_column);
-		column.forEach(square => {
-			let occupiedBy = square.getOccupiedBy();
+		column.forEach(space => {
+			let occupiedBy = space.getOccupiedBy();
 			let _occupiedBy = null;
 			if(occupiedBy !== null){
 				_occupiedBy = {
@@ -307,7 +307,7 @@ function parseArena(){
 					_occupiedBy.team = occupiedBy.getTeam();
 				}
 			}
-			_column.push({eatables: square.getEatable(), occupiedBy: _occupiedBy});
+			_column.push({eatables: space.getEatable(), occupiedBy: _occupiedBy});
 		});
 	});
 	return _arena;
