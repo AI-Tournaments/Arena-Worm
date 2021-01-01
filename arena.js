@@ -27,6 +27,12 @@ class Placeable{
 		}
 	}
 }
+class Wall extends Placeable{
+	constructor(space=null, controllable=null){
+		super(space);
+		this.getOrigin = ()=>controllable;
+	}
+}
 class Controllable extends Placeable{
 	constructor(body, space=null){
 		const BODY = body;
@@ -89,8 +95,7 @@ class SolidWorm extends Controllable{
 				let occupiedBy;
 				switch(settings.rules.defeatedWorms){
 					case 'Solid':
-						team = -team - 1;
-						occupiedBy = part;
+						occupiedBy = new Wall(space, part);
 						break;
 					case 'Eatable':
 						space.addEatable();
@@ -288,7 +293,21 @@ function parseArena(){
 		_arena.push(_column);
 		column.forEach(square => {
 			let occupiedBy = square.getOccupiedBy();
-			_column.push({eatables: square.getEatable(), occupiedBy: occupiedBy === null ? null : {team: occupiedBy.getTeam(), head: occupiedBy.constructor.name === 'SolidWorm'}});
+			let _occupiedBy = null;
+			if(occupiedBy !== null){
+				_occupiedBy = {
+					type: occupiedBy.constructor.name
+				};
+				if(_occupiedBy.type === 'Wall'){
+					_occupiedBy.origin = {
+						team: occupiedBy.getOrigin().getTeam(),
+						type: occupiedBy.getOrigin().constructor.name
+					};
+				}else{
+					_occupiedBy.team = occupiedBy.getTeam();
+				}
+			}
+			_column.push({eatables: square.getEatable(), occupiedBy: _occupiedBy});
 		});
 	});
 	return _arena;
