@@ -5,38 +5,32 @@
 			"teams": {"min": 2, "max": 6},
 			"participantsPerTeam": {"min": 1, "max": 1}
 		},
-		"settings": {
-			"general": {
-				"averageOf": {"min": 1, "max": null},
-				"timelimit_ms": {"min": 0, "max": null}
-			},
-			"arena": {
-				"size": {"min": 5, "max": null, "step": 2}
-			},
-			"rules": {
-				"startLength": {"min": 1, "max": null, "step": 1}
-			}
+		"includeScripts": {
+			"arena": [],
+			"participants": []
 		},
 		"symmetric": true,
 		"randomness": true
 	},
 	"settings": {
-		"general": {
-			"averageOf": 1,
-			"allowRemoteExecution": false,
-			"displayOpponents": ["Hide", "AccountOnly", "Yes"],
-			"timelimit_ms": 1000
-		},
 		"arena": {
 			"size": 15,
 			"noBorder": false,
-			"threeDimensions": false
+			"threeDimensions": false,
+			"_meta": {
+				"size": {"min": 5, "max": null, "step": 2}
+			}
 		},
 		"rules": {
 			"startLength": 1,
+			"ticksPerShrink": 0,
 			"apples": ["FourSymmetry", "Random_asymmetric", "RandomOnePerWorm_asymmetric"],
 			"defeatedWorms": ["Solid", "Eatable", "Disappears"],
-			"winner": ["LastWormStanding", "MostPoints"]
+			"winner": ["LastWormStanding", "MostPoints"],
+			"_meta": {
+				"startLength": {"min": 1, "max": null, "step": 1},
+				"ticksPerShrink": {"min": -1, "max": null, "step": 1}
+			}
 		}
 	}
 }
