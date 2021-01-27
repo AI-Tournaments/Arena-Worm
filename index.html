@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Replay</title>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-173346924-1"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-173346924-1');</script>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport">
+		<meta content="yes" name="mobile-web-app-capable">
+		<style>
+			#gamebord-wrapper {
+				text-align: center;
+			}
+
+			#gamebord {
+				cursor: default;
+				user-select: none;
+				display: inline-block;
+				border: 1px solid black;
+				background-color: whitesmoke;
+			}
+
+			#controller {
+				width: 100%;
+				display: flex;
+			}
+			#slider, #slider-layer {
+				width: -webkit-fill-available;
+			}
+
+			.layer {
+				display: grid;
+			}
+
+			.space {
+				border: 1px solid black;
+				text-align: center;
+				width: 20px;
+				height: 20px;
+			}
+
+			.eatable {
+				color: red;
+			}
+
+			.type-SolidWorm {
+				color: green;
+			}
+
+			.type-TrailingBody {
+				color: yellow;
+			}
+
+			.type-Wall {
+				color: blue;
+			}
+		</style>
+		<script src="index.js"></script>
+	</head>
+	<body onload="a()">
+		<div id="gamebord-wrapper">
+			<div id="gamebord"></div>
+			<div id="controller">
+				<input type="button" id="step-back" value="<" disabled>
+				<input type="button" id="step-next" value=">">
+				<input type="range" value="0" min="0" id="slider">
+				<input type="range" value="0" min="0" id="slider-layer" style="display: none;">
+			</div>
+		</div>
+	</body>
+</html>

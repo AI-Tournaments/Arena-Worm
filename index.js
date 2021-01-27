@@ -1,0 +1,75 @@
+'use strict'
+function a(){
+	let data = JSON.parse(decodeURI(location.hash.substring(1)));
+	let slider = document.getElementById('slider');
+	let sliderLayer = document.getElementById('slider-layer');
+	let buttonBack = document.getElementById('step-back');
+	let buttonNext = document.getElementById('step-next');
+	let gameboard = document.getElementById('gamebord');
+	buttonBack.addEventListener('click', step);
+	buttonNext.addEventListener('click', step);
+	slider.max = data.log.length-1;
+	slider.addEventListener('input', event=>{
+		setTick(slider.valueAsNumber);
+	});
+	if(data.settings.arena.threeDimensions){
+		sliderLayer.style.display = undefined;
+	}
+	window.onresize = resizeGameboard;
+	setTick(0);
+	function step(mouseEvent){
+		slider.valueAsNumber += mouseEvent.target === buttonNext ? 1 : -1;
+		setTick(slider.valueAsNumber);
+	}
+	function setTick(logIndex=-1){
+		buttonBack.disabled = slider.valueAsNumber === 0;
+		buttonNext.disabled = slider.valueAsNumber === data.log.length - 1;
+		let tick = -1 < logIndex ? JSON.parse(JSON.stringify(data.log[logIndex])) : null;
+		while (gameboard.firstChild) {
+			gameboard.removeChild(gameboard.lastChild);
+		}
+		let layerWrapper = document.createElement('div');
+		layerWrapper.classList.add('layer');
+		gameboard.appendChild(layerWrapper);
+		let gridTemplateColumns = '';
+		for(let y = data.settings.arena.size-1; 0 <= y; y--){
+			gridTemplateColumns += 'auto ';
+			for(let x = 0; x < data.settings.arena.size; x++){
+				let space = document.createElement('div');
+				space.classList.add('space');
+				let spaceData = tick.value[x][y];
+				if(0 < spaceData.eatables){
+					space.innerHTML = spaceData.eatables;
+					space.classList.add('eatable');
+				}else if(spaceData.occupiedBy !== null){
+					space.classList.add('type-'+spaceData.occupiedBy.type);
+					if(spaceData.occupiedBy.type === 'Wall'){
+						space.innerHTML = spaceData.occupiedBy.origin.team;
+						space.classList.add('origin-type-'+spaceData.occupiedBy.origin.type);
+					}else{
+						space.innerHTML = spaceData.occupiedBy.team;
+						space.classList.add('worm');
+					}
+				}
+				layerWrapper.appendChild(space);
+			}
+		}
+		layerWrapper.style.gridTemplateColumns = gridTemplateColumns.trim();
+	}
+	function resizeGameboard(){
+		let allSquares = [...document.getElementsByClassName('square')];
+		gameboard.style.zoom = 1;
+		/*let maxWidth = allSquares[0].clientHeight;
+		// Get max
+		for(let square of allSquares){
+			square.style.width = '';
+			maxWidth = Math.max(maxWidth, square.clientWidth);
+		}
+		// Set max
+		for(let square of allSquares){
+			square.style.width = maxWidth + 'px';
+		}*/
+		let zoom = gameboard.parentElement.offsetWidth / gameboard.offsetWidth;
+		gameboard.style.zoom = zoom;
+	}
+}
