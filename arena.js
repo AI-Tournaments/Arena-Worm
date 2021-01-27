@@ -4,8 +4,12 @@ let coordinate_end;
 let coordinate_middle;
 let participants;
 let settings;
+let shrinkOnTick;
+let ticksSinceShrink = 0;
+let shrinks = 0;
 let worms = [];
 let worms_lastLength;
+let participantPromises;
 class Direction{
 	static #UP = new Direction();
 	static #DOWN = new Direction();
@@ -112,6 +116,7 @@ class SolidWorm extends Controllable{
 class TrailingBody extends Controllable{
 	constructor(body){
 		super(body);
+		this.getHead = ()=>body[0];
 	}
 }
 class Space{
@@ -163,53 +168,13 @@ class Space{
 		}
 	}
 }
-function callbackError(participant, messageEvent){
-	console.error(participant);
-	console.error(messageEvent);
+function callbackError(response){
+	console.error(response.message);
 }
-function callback(participant, messageEvent){
-	participant.payload.response = messageEvent.data;
-	updateDirection(participant);
-	let missingResponse = false;
-	worms.forEach(solidWorm => {
-		missingResponse |= solidWorm.getParticipant().payload.response === null;
-	});
-	if(missingResponse){
-		return;
-	}
-	let challengedSpaces = [];
-	let borderCollisions = [];
-	worms.forEach(solidWorm => {
-		let pos = getPos(solidWorm);
-		let posNext = getNextPos(pos, solidWorm.direction);
-		if(posNext === null){
-			borderCollisions.push(solidWorm);
-		}else{
-			let space = arena[posNext[0]][posNext[1]];
-			space.addChallenger(solidWorm);
-			if(!challengedSpaces.includes(space)){
-				challengedSpaces.push(space);
-			}
-		}
-	});
-	borderCollisions.forEach(solidWorm => {
-		solidWorm.kill();
-	});
-	challengedSpaces.forEach(space => {
-		space.executeChallenge();
-	});
-	if(settings.rules.winner === 'LastWormStanding' && worms_lastLength !== worms.length){
-		worms.forEach(solidWorm => {
-			participants.addScore(solidWorm.getTeam(), 1);
-		});
-	}
-	worms_lastLength = worms.length;
-	if(0 < worms.length){
-		tick();
-	}else{
-		ArenaHelper.log('tick', parseArena());
-		ArenaHelper.postDone();
-	}
+function callback(response){
+	response.participant.payload.response = response.data;
+	updateDirection(response.participant);
+	response.participant.payload.wormUpdated();
 }
 function getPos(solidWorm){
 	for(let x = 0; x < arena.length; x++){
@@ -299,10 +264,8 @@ function parseArena(){
 					type: occupiedBy.constructor.name
 				};
 				if(_occupiedBy.type === 'Wall'){
-					_occupiedBy.origin = {
-						team: occupiedBy.getOrigin().getTeam(),
-						type: occupiedBy.getOrigin().constructor.name
-					};
+					let origin = occupiedBy.getOrigin();
+					_occupiedBy.origin = origin === null ? null : {team: origin.getTeam(), type: origin.constructor.name};
 				}else{
 					_occupiedBy.team = occupiedBy.getTeam();
 				}
@@ -313,42 +276,120 @@ function parseArena(){
 	return _arena;
 }
 function tick(){
+	if(shrinkOnTick !== null){
+		ticksSinceShrink++;
+		if(shrinkOnTick === ticksSinceShrink){
+			ticksSinceShrink = 0;
+			arena.forEach((column, columnIndex) => {
+				column.forEach((space, rowIndex) => {
+					if(columnIndex === shrinks || columnIndex === arena.length-1-shrinks || rowIndex === shrinks || rowIndex === arena.length-1-shrinks){
+						let occupiedBy = space.getOccupiedBy();
+						if(occupiedBy !== null){
+							space.setOccupiedBy(new Wall(space, occupiedBy));
+							debugger;
+							switch(occupiedBy.constructor.name){
+								case 'SolidWorm':
+									occupiedBy.kill();
+									break;
+								case 'TrailingBody':
+									occupiedBy.getHead().kill();
+									break;
+							}
+						}
+					}
+				});
+			});
+		}
+	}
 	let parsedArena = parseArena();
 	ArenaHelper.log('tick', parsedArena);
+	participantPromises = [];
 	worms.forEach(solidWorm => {
 		let arenaClone = JSON.parse(JSON.stringify(parsedArena));
+		let rotate;
 		switch(solidWorm.getTeam()){
-			default: case 0: break;
-			case 1:
-				for(let index = 0; index < arenaClone.length; index++){
-					arenaClone[index].reverse();
-				}
-				break;
-			case 3:
-				arenaClone.reverse();
-			case 2:
-				arenaClone = arenaClone[0].map((x, xIndex) => arenaClone.map(y => y[xIndex]));
-				break;
+			case 0: rotate = 0; break;
+			case 1: rotate = 2; break;
+			case 2: rotate = 1; break;
+			case 3: rotate = 3; break;
+		}
+		for(let i = 0; i < rotate; i++){
+			arenaClone = rotateArray(arenaClone);
 		}
 		let participant = solidWorm.getParticipant();
 		participant.payload.response = null;
-		participant.postMessage(arenaClone);
+		participant.postMessage(arenaClone).then(callback).catch(callbackError);
+		participantPromises.push(new Promise(resolve => participant.payload.wormUpdated = resolve));
+	});
+	Promise.all(participantPromises).then(()=>{
+		let challengedSpaces = [];
+		let borderCollisions = [];
+		worms.forEach(solidWorm => {
+			let pos = getPos(solidWorm);
+			let posNext = getNextPos(pos, solidWorm.direction);
+			if(posNext === null){
+				borderCollisions.push(solidWorm);
+			}else{
+				let space = arena[posNext[0]][posNext[1]];
+				space.addChallenger(solidWorm);
+				if(!challengedSpaces.includes(space)){
+					challengedSpaces.push(space);
+				}
+			}
+		});
+		borderCollisions.forEach(solidWorm => {
+			solidWorm.kill();
+		});
+		challengedSpaces.forEach(space => {
+			space.executeChallenge();
+		});
+		if(settings.rules.winner === 'LastWormStanding' && worms_lastLength !== worms.length){
+			worms.forEach(solidWorm => {
+				participants.addScore(solidWorm.getTeam(), 1);
+			});
+		}
+		worms_lastLength = worms.length;
+		if(0 < worms.length){
+			tick();
+		}else{
+			ArenaHelper.log('tick', parseArena());
+			ArenaHelper.postDone();
+		}
 	});
 }
-onmessage = messageEvent => {
-	importScripts(messageEvent.data.ArenaHelper_url);
-	settings = messageEvent.data.settings;
-	if(messageEvent.data.participants.length%2 !== 0){
+function rotateArray(array){
+	let result = [];
+	for(let i = 0; i < array[0].length; i++){
+		let row = array.map(e => e[i]).reverse();
+		result.push(row);
+	}
+	return result;
+}
+ArenaHelper.init.then(_participants => {
+	participants = _participants;
+	settings = participants.getSettings();
+	if(participants.countTeams()%2 !== 0){
 		ArenaHelper.postAbort('', 'Uneven amount of teams is not supported.');
 	}else if(settings.arena.size%2 !== 1){
 		ArenaHelper.postAbort('', 'Arena size has to be uneven.');
 	}else if(settings.rules.winner === 'MostPoints' && settings.rules.defeatedWorms !== 'Solid'){
 		ArenaHelper.postAbort('', 'Incompatible rules: MostPoints can only be played with Solid.');
-	}else if(!settings.arena.threeDimensions && 4 < messageEvent.data.participants.length){
+	}else if(!settings.arena.threeDimensions && 4 < participants.countTeams()){
 		ArenaHelper.postAbort('', '`threeDimensions` is required for more than 4 participants.');
 	}else if(settings.arena.threeDimensions){
 		ArenaHelper.postAbort('', '`threeDimensions` is currently not supported.');
 	}else{
+		switch(settings.rules.ticksPerShrink){
+			case -1:
+				shrinkOnTick = null;
+				break;
+			case 0:
+				shrinkOnTick = settings.arena.size;
+				break;
+			default:
+				shrinkOnTick = settings.rules.ticksPerShrink;
+				break;
+		}
 		arena = [];
 		while(arena.length < settings.arena.size){
 			let column = [];
@@ -369,7 +410,7 @@ onmessage = messageEvent => {
 		arena[coordinate_middle][coordinate_end].setOccupiedBy(solidWorm);
 		worms.push(solidWorm);
 
-		if(2 < messageEvent.data.participants.length){
+		if(2 < participants.countTeams()){
 			solidWorm = new SolidWorm(2, Direction.getRight())
 			arena[0][coordinate_middle].setOccupiedBy(solidWorm);
 			worms.push(solidWorm);
@@ -379,19 +420,9 @@ onmessage = messageEvent => {
 			worms.push(solidWorm);
 		}
 		worms_lastLength = worms.length;
-		participants = new ArenaHelper.Participants(messageEvent.data, ()=>{
-			worms.forEach(solidWorm => {
-				solidWorm.getParticipant().payload.worm = solidWorm;
-			});
-			onmessage = messageEvent => {
-				if(messageEvent.data === 'Start'){
-					participants.addCallbackToAll(callback, callbackError);
-					tick();
-				}
-			}
-			postMessage({type: 'Ready-To-Start', message: null});
-		}, error => {
-			ArenaHelper.postAbort('Did-Not-Start', error);
-		}, (participantName, error) => ArenaHelper.postAbort(participantName, error));
+		worms.forEach(solidWorm => {
+			solidWorm.getParticipant().payload.worm = solidWorm;
+		});
+		tick();
 	}
-}
+});
