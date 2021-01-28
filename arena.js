@@ -365,7 +365,7 @@ function rotateArray(array){
 	}
 	return result;
 }
-ArenaHelper.init.then(_participants => {
+ArenaHelper.init = _participants => {
 	participants = _participants;
 	settings = participants.getSettings();
 	if(participants.countTeams()%2 !== 0){
@@ -425,4 +425,4 @@ ArenaHelper.init.then(_participants => {
 		});
 		tick();
 	}
-});
+};
