@@ -318,7 +318,7 @@ function tick(){
 		}
 		let participant = solidWorm.getParticipant();
 		participant.payload.response = null;
-		participant.postMessage(arenaClone).then(callback).catch(callbackError);
+		participant.postMessage(arenaClone).then(callback);
 		participantPromises.push(new Promise(resolve => participant.payload.wormUpdated = resolve));
 	});
 	Promise.all(participantPromises).then(()=>{
