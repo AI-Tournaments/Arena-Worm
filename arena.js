@@ -365,9 +365,9 @@ function rotateArray(array){
 	}
 	return result;
 }
-ArenaHelper.init = _participants => {
+ArenaHelper.init = (_participants, _settings) => {
 	participants = _participants;
-	settings = participants.getSettings();
+	settings = _settings;
 	if(participants.countTeams()%2 !== 0){
 		ArenaHelper.postAbort('', 'Uneven amount of teams is not supported.');
 	}else if(settings.arena.size%2 !== 1){
