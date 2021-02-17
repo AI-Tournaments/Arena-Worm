@@ -9,8 +9,7 @@
 			"arena": [],
 			"participants": []
 		},
-		"symmetric": true,
-		"randomness": true
+		"symmetric": true
 	},
 	"settings": {
 		"arena": {
