@@ -286,7 +286,6 @@ function tick(){
 						let occupiedBy = space.getOccupiedBy();
 						if(occupiedBy !== null){
 							space.setOccupiedBy(new Wall(space, occupiedBy));
-							debugger;
 							switch(occupiedBy.constructor.name){
 								case 'SolidWorm':
 									occupiedBy.kill();
