@@ -120,35 +120,42 @@ class TrailingBody extends Controllable{
 	}
 }
 class Space{
+	static #placedApples = [];
+	static getPlacedApples = ()=>Space.#placedApples.slice();
 	constructor(){
 		const CHALLENGERS = new Array()
 		let occupiedBy = null;
-		let eatable = 0;
+		let eatables = 0;
+		let apple = false;
 		function willBeUnoccupied(){
 			return occupiedBy === null ? true : occupiedBy.getLength()-1 === occupiedBy.getPlace();
 		}
 		this.addEatable = ()=>{
-			eatable++;
+			eatables++;
 		}
 		this.addChallenger = solidWorm=>{
 			CHALLENGERS.push(solidWorm);
 		}
 		this.executeChallenge = ()=>{
-			let _willBeUnoccupied = willBeUnoccupied();
+			let unoccupied = willBeUnoccupied();
 			CHALLENGERS.forEach(solidWorm => {
-				if(_willBeUnoccupied){
+				if(unoccupied){
+					if(apple){
+						apple = false;
+						eatables++;
+					}
 					if(_settings.rules.winner === 'MostPoints'){
-						_participants.addScore(solidWorm.getTeam(), eatable);
+						_participants.addScore(solidWorm.getTeam(), eatables);
 					}
 					if(CHALLENGERS.length === 1){
-						while(0 < eatable){
-							eatable--;
+						while(0 < eatables){
+							eatables--;
 							solidWorm.extendBody();
 						}
 					}
 					solidWorm.move(this);
 				}
-				if(1 < CHALLENGERS.length || !_willBeUnoccupied){
+				if(1 < CHALLENGERS.length || !unoccupied){
 					solidWorm.kill();
 				}
 			});
@@ -163,13 +170,18 @@ class Space{
 				solidWorm.setSpace(this);
 			}
 		}
-		this.getEatable = ()=>{
-			return eatable;
+		this.setApple = (set=false)=>{
+			apple = set;
+			if(set){
+				Space.#placedApples.push(this);
+			}else{
+				Space.#placedApples.splice(Space.#placedApples.indexOf(this), 1);
+			}
+		}
+		this.getEatables = ()=>{
+			return {apple: apple, other: eatables};
 		}
 	}
-}
-function callbackError(response){
-	console.error(response.message);
 }
 function callback(response){
 	response.participant.payload.response = response.data;
@@ -270,7 +282,7 @@ function parseArena(){
 					_occupiedBy.team = occupiedBy.getTeam();
 				}
 			}
-			_column.push({eatables: space.getEatable(), occupiedBy: _occupiedBy});
+			_column.push({eatables: space.getEatables(), occupiedBy: _occupiedBy});
 		});
 	});
 	return parsedArena;
@@ -298,6 +310,28 @@ function tick(){
 					}
 				});
 			});
+		}
+	}
+	let placedApples = Space.getPlacedApples();
+	if(placedApples.length < 4){
+		if(['FourSymmetry', 'Random_asymmetric'].includes(_settings.rules.apples)){
+			placedApples.forEach(space => {
+				space.setApple(false);
+			});
+		}
+		switch(_settings.rules.apples){
+			case 'FourSymmetry':
+				let short = Math.round(Math.random()*Math.floor(_settings.arena.size/2));
+				let long = Math.round(Math.random()*Math.ceil(_settings.arena.size/2));
+				
+				break;
+			case 'Random_asymmetric':
+				for(let i = 0; 4 < placedApples.length; i++){
+					
+				}
+				break;
+			case 'RandomOnePerWorm_asymmetric':
+				break;
 		}
 	}
 	let parsedArena = parseArena();
