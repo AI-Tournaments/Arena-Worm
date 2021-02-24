@@ -339,7 +339,7 @@ function tick(){
 			}
 			while(Space.getPlacedApples().length < 4){
 				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
-				let randomSpace = Math.floor(Math.random()*emptySpaces.length)
+				let randomSpace = Math.floor(Math.random()*emptySpaces.length);
 				randomSpace.setApple(true);
 			}
 			break;
@@ -347,7 +347,7 @@ function tick(){
 			while(Space.getPlacedApples().length < _worms.length){
 				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
 				if(emptySpaces.length === 0){break;}
-				let randomSpace = Math.floor(Math.random()*emptySpaces.length)
+				let randomSpace = Math.floor(Math.random()*emptySpaces.length);
 				randomSpace.setApple(true);
 			}
 			break;
