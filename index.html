@@ -7,6 +7,9 @@
 		<meta content="width=device-width, initial-scale=1.0" name="viewport">
 		<meta content="yes" name="mobile-web-app-capable">
 		<style>
+			:root {
+				--square-size: 20px;
+			}
 			#gamebord-wrapper {
 				text-align: center;
 			}
@@ -34,8 +37,8 @@
 			.space {
 				border: 1px solid black;
 				text-align: center;
-				width: 20px;
-				height: 20px;
+				width: var(--square-size);
+				height: var(--square-size);
 			}
 
 			.eatable {
@@ -47,11 +50,11 @@
 			}
 
 			.type-TrailingBody {
-				color: yellow;
+				color: blue;
 			}
 
 			.type-Wall {
-				color: blue;
+				color: darkgray;
 			}
 		</style>
 		<script src="index.js"></script>
