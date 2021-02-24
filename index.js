@@ -1,4 +1,16 @@
 'use strict'
+window.addEventListener('message', messageEvent => {
+	console.log('// TODO: Move to separate js-file and try to force load.');
+	switch(messageEvent.data.type){
+		case 'Init-Fetch-Replay-Height':
+			function postHeight(){
+				messageEvent.source.postMessage({type: 'Replay-Height', value: document.documentElement.scrollHeight}, messageEvent.origin);
+			}
+			window.addEventListener('resize', postHeight);
+			postHeight();
+			break;
+	}
+});
 function a(){
 	let data = JSON.parse(decodeURI(location.hash.substring(1)));
 	let slider = document.getElementById('slider');
