@@ -23,7 +23,7 @@
 		"rules": {
 			"startLength": 1,
 			"ticksPerShrink": 0,
-			"apples": ["FourSymmetry", "Random_asymmetric", "RandomOnePerWorm_asymmetric"],
+			"apples": ["FourSymmetry", "FourRandom_asymmetric", "RandomOnePerWorm_asymmetric"],
 			"defeatedWorms": ["Solid", "Eatable", "Disappears"],
 			"winner": ["LastWormStanding", "MostPoints"],
 			"_meta": {

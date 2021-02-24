@@ -170,15 +170,17 @@ class Space{
 				solidWorm.setSpace(this);
 			}
 		}
-		this.setApple = (set=false)=>{
-			apple = set;
-			if(set){
-				Space.#placedApples.push(this);
-			}else{
-				Space.#placedApples.splice(Space.#placedApples.indexOf(this), 1);
+		this.setApple = ()=>{
+			if(occupiedBy === null){
+				apple = !Space.#placedApples.includes(this);
+				if(apple){
+					Space.#placedApples.push(this);
+				}else{
+					Space.#placedApples.splice(Space.#placedApples.indexOf(this), 1);
+				}
 			}
 		}
-		this.getEatables = ()=>{
+			this.getEatables = ()=>{
 			return {apple: apple, other: eatables};
 		}
 	}
@@ -312,27 +314,43 @@ function tick(){
 			});
 		}
 	}
-	let placedApples = Space.getPlacedApples();
-	if(placedApples.length < 4){
-		if(['FourSymmetry', 'Random_asymmetric'].includes(_settings.rules.apples)){
-			placedApples.forEach(space => {
-				space.setApple(false);
-			});
-		}
-		switch(_settings.rules.apples){
-			case 'FourSymmetry':
+	switch(_settings.rules.apples){
+		case 'FourSymmetry': // When one is eaten, all get renewed.
+			let retries = 100;
+			while(0 < retries && Space.getPlacedApples().length < 4){
+				retries--;
+				Space.getPlacedApples().forEach(space => {
+					space.setApple(false);
+				});
 				let short = Math.round(Math.random()*Math.floor(_settings.arena.size/2));
 				let long = Math.round(Math.random()*Math.ceil(_settings.arena.size/2));
-				
+				_arena[short][long].setApple(true);
+				_arena[_settings.arena.size-1-long][short].setApple(true);
+				_arena[long][_settings.arena.size-1-short].setApple(true);
+				_arena[_settings.arena.size-1-short][_settings.arena.size-1-long].setApple(true);
+			}
+			break;
+		case 'FourRandom_asymmetric': // When one is eaten, all get renewed.
+			Space.getPlacedApples().forEach(space => {
+				space.setApple(false);
+			});
+			if(_arena.flat().filter(space=>space.getOccupiedBy()===null).length < 4){
 				break;
-			case 'Random_asymmetric':
-				for(let i = 0; 4 < placedApples.length; i++){
-					
-				}
-				break;
-			case 'RandomOnePerWorm_asymmetric':
-				break;
-		}
+			}
+			while(Space.getPlacedApples().length < 4){
+				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
+				let randomSpace = Math.floor(Math.random()*emptySpaces.length)
+				randomSpace.setApple(true);
+			}
+			break;
+		case 'RandomOnePerWorm_asymmetric': // When one is eaten, only it get renewed.
+			while(Space.getPlacedApples().length < _worms.length){
+				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
+				if(emptySpaces.length === 0){break;}
+				let randomSpace = Math.floor(Math.random()*emptySpaces.length)
+				randomSpace.setApple(true);
+			}
+			break;
 	}
 	let parsedArena = parseArena();
 	ArenaHelper.log('tick', parsedArena);
