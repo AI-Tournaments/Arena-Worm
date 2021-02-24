@@ -38,9 +38,18 @@ function a(){
 				let space = document.createElement('div');
 				space.classList.add('space');
 				let spaceData = tick.value[x][y];
-				if(0 < spaceData.eatables){
-					space.innerHTML = spaceData.eatables;
+				if(spaceData.eatables.apple || 0 < spaceData.eatables.other){
+					spaceData.eatables.other++;
 					space.classList.add('eatable');
+					if(spaceData.eatables.apple){
+						space.innerHTML = '🍎';
+					}
+					if(false && 0 < spaceData.eatables.other){
+						if(spaceData.eatables.apple){
+							space.innerHTML += ', ';
+						}
+						space.innerHTML += spaceData.eatables.other;
+					}
 				}else if(spaceData.occupiedBy !== null){
 					space.classList.add('type-'+spaceData.occupiedBy.type);
 					if(spaceData.occupiedBy.type === 'Wall'){
