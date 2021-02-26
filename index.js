@@ -48,6 +48,7 @@ function a(){
 		}
 		window.onresize();
 	}
+	playToggled(undefined, true);
 	function playFrame(){
 		if(play.value !== '▶'){
 			if(250 < Date.now()-playStarted){
