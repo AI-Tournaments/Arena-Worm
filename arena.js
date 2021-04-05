@@ -5,6 +5,7 @@ let _coordinate_middle;
 let _participants;
 let _settings;
 let _shrinkOnTick;
+let _tick = 0;
 let _ticksSinceShrink = 0;
 let _shrinks = 0;
 let _worms = [];
@@ -35,6 +36,7 @@ class Wall extends Placeable{
 	constructor(space=null, controllable=null){
 		super(space);
 		this.getOrigin = ()=>controllable;
+		this.getTeam = ()=>null;
 	}
 }
 class Controllable extends Placeable{
@@ -42,7 +44,7 @@ class Controllable extends Placeable{
 		const BODY = body;
 		super(space);
 		if(this.constructor.name === 'Controllable'){
-			throw new Error('Controllable is not constructable.');
+			ArenaHelper.postAbort('', 'Controllable is not constructable.');
 		}
 		if(this.constructor.name === 'SolidWorm'){
 			BODY.push(this);
@@ -63,19 +65,19 @@ class SolidWorm extends Controllable{
 		const BODY = new Array();
 		super(BODY);
 		this.direction = direction;
-		function getWormIndex(){
+		this.getWormIndex = ()=>{
 			let index = _worms.indexOf(this);
-			if(index !== -1){
-				throw new Error('SolidWorm is dead.');
+			if(index === -1){
+				ArenaHelper.postAbort('', 'SolidWorm is dead.');
 			}
 			return index;
 		}
 		this.extendBody = ()=>{
-			getWormIndex();
+			this.getWormIndex();
 			BODY.push(new TrailingBody(BODY));
 		}
 		this.move = nextSpace=>{
-			getWormIndex();
+			this.getWormIndex();
 			let space;
 			BODY.forEach(part=>{
 				space = part.getSpace();
@@ -93,7 +95,7 @@ class SolidWorm extends Controllable{
 		}
 		this.getTeamNumber = ()=>team;
 		this.kill = ()=>{
-			_worms.splice(getWormIndex(), 1);
+			_worms.splice(this.getWormIndex(), 1);
 			BODY.forEach(part=>{
 				let space = part.getSpace();
 				let occupiedBy;
@@ -128,7 +130,7 @@ class Space{
 		let eatables = 0;
 		let apple = false;
 		function willBeUnoccupied(){
-			return occupiedBy === null ? true : occupiedBy.getLength()-1 === occupiedBy.getPlace();
+			return occupiedBy === null ? true : !occupiedBy instanceof Wall && occupiedBy.getLength()-1 === occupiedBy.getPlace();
 		}
 		this.addEatable = ()=>{
 			eatables++;
@@ -141,7 +143,7 @@ class Space{
 			CHALLENGERS.forEach(solidWorm => {
 				if(unoccupied){
 					if(apple){
-						apple = false;
+						this.setApple(false);
 						eatables++;
 					}
 					if(_settings.rules.winner === 'MostPoints'){
@@ -199,6 +201,7 @@ function getPos(solidWorm){
 			}
 		}
 	}
+	ArenaHelper.postAbort('', 'Position not found.');
 }
 function getNextPos(pos, direction){
 	switch(direction){
@@ -277,7 +280,7 @@ function parseArena(){
 				_occupiedBy = {
 					type: occupiedBy.constructor.name
 				};
-				if(_occupiedBy.type === 'Wall'){
+				if(occupiedBy instanceof Wall){
 					let origin = occupiedBy.getOrigin();
 					_occupiedBy.origin = origin === null ? null : {team: origin.getTeam(), type: origin.constructor.name};
 				}else{
@@ -293,6 +296,7 @@ function tick(){
 	if(_shrinkOnTick !== null){
 		_ticksSinceShrink++;
 		if(_shrinkOnTick === _ticksSinceShrink){
+			console.log('Shrink!');
 			_ticksSinceShrink = 0;
 			_arena.forEach((column, columnIndex) => {
 				column.forEach((space, rowIndex) => {
@@ -407,6 +411,11 @@ function tick(){
 			ArenaHelper.postDone();
 		}
 	});
+	if(50 < _tick){
+		console.log('// TODO: Temp abort.');
+		ArenaHelper.postDone();
+	}
+	_tick++;
 }
 function rotateArray(array){
 	let result = [];
@@ -443,7 +452,7 @@ ArenaHelper.init = (participants, settings) => {
 			}
 			_arena.push(column);
 		}
-		
+
 		_coordinate_end = _settings.arena.size-1;
 		_coordinate_middle = Math.floor(_coordinate_end/2);
 
