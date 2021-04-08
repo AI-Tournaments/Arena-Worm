@@ -411,10 +411,6 @@ function tick(){
 			ArenaHelper.postDone();
 		}
 	});
-	if(50 < _tick){
-		console.log('// TODO: Temp abort.');
-		ArenaHelper.postDone();
-	}
 	_tick++;
 }
 function rotateArray(array){
