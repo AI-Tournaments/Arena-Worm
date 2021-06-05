@@ -101,23 +101,11 @@ function a(){
 						if(spaceData.occupiedBy.type === 'Wall'){
 							space.innerHTML = spaceData.occupiedBy.origin.team;
 							space.classList.add('origin-type-'+spaceData.occupiedBy.origin.type);
+							space.style.color = getTeamColor(matchLog, spaceData.occupiedBy.origin.team);
 						}else{
 							space.innerHTML = spaceData.occupiedBy.team;
 							space.classList.add('worm');
-							let color = matchLog.teamColors[spaceData.occupiedBy.team];
-							let red = Math.round(256*color.R).toString(16);
-							if(red.length === 1){
-								red = '0' + red;
-							}
-							let green = Math.round(256*color.G).toString(16);
-							if(green.length === 1){
-								green = '0' + green;
-							}
-							let blue = Math.round(256*color.B).toString(16);
-							if(blue.length === 1){
-								blue = '0' + blue;
-							}
-							space.style.color = '#'+red+green+blue;
+							space.style.color = getTeamColor(matchLog, spaceData.occupiedBy.team);
 						}
 					}
 					layerWrapper.appendChild(space);
@@ -126,4 +114,20 @@ function a(){
 			layerWrapper.style.gridTemplateColumns = gridTemplateColumns.trim();
 		}
 	});
+	function getTeamColor(matchLog, team){
+		let color = matchLog.teamColors[team];
+		let red = Math.round(256*color.R).toString(16);
+		if(red.length === 1){
+			red = '0' + red;
+		}
+		let green = Math.round(256*color.G).toString(16);
+		if(green.length === 1){
+			green = '0' + green;
+		}
+		let blue = Math.round(256*color.B).toString(16);
+		if(blue.length === 1){
+			blue = '0' + blue;
+		}
+		return '#'+red+green+blue
+	}
 }
