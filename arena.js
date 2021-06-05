@@ -166,10 +166,10 @@ class Space{
 			}
 		}
 		this.getOccupiedBy = ()=>occupiedBy;
-		this.setOccupiedBy = solidWorm=>{
-			occupiedBy = solidWorm;
-			if(solidWorm !== null){
-				solidWorm.setSpace(this);
+		this.setOccupiedBy = placeable=>{
+			occupiedBy = placeable;
+			if(placeable !== null){
+				placeable.setSpace(this);
 			}
 		}
 		this.setApple = ()=>{
@@ -182,7 +182,7 @@ class Space{
 				}
 			}
 		}
-			this.getEatables = ()=>{
+		this.getEatables = ()=>{
 			return {apple: apple, other: eatables};
 		}
 	}
@@ -303,7 +303,6 @@ function tick(){
 					if(columnIndex === _shrinks || columnIndex === _arena.length-1-_shrinks || rowIndex === _shrinks || rowIndex === _arena.length-1-_shrinks){
 						let occupiedBy = space.getOccupiedBy();
 						if(occupiedBy !== null){
-							space.setOccupiedBy(new Wall(space, occupiedBy));
 							switch(occupiedBy.constructor.name){
 								case 'SolidWorm':
 									occupiedBy.kill();
@@ -312,11 +311,13 @@ function tick(){
 									occupiedBy.getHead().kill();
 									break;
 							}
+							space.setOccupiedBy(new Wall(space, occupiedBy));
 						}
 					}
 				});
 			});
 		}
+		_shrinks++;
 	}
 	switch(_settings.rules.apples){
 		case 'FourSymmetry': // When one is eaten, all get renewed.
