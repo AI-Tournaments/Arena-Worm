@@ -95,7 +95,8 @@ function a(){
 							}
 							space.innerHTML += spaceData.eatables.other;
 						}
-					}else if(spaceData.occupiedBy !== null){
+					}
+					if(spaceData.occupiedBy !== null){
 						space.classList.add('type-'+spaceData.occupiedBy.type);
 						if(spaceData.occupiedBy.type === 'Wall'){
 							space.innerHTML = spaceData.occupiedBy.origin.team;
@@ -103,6 +104,20 @@ function a(){
 						}else{
 							space.innerHTML = spaceData.occupiedBy.team;
 							space.classList.add('worm');
+							let color = matchLog.teamColors[spaceData.occupiedBy.team];
+							let red = Math.round(256*color.R).toString(16);
+							if(red.length === 1){
+								red = '0' + red;
+							}
+							let green = Math.round(256*color.G).toString(16);
+							if(green.length === 1){
+								green = '0' + green;
+							}
+							let blue = Math.round(256*color.B).toString(16);
+							if(blue.length === 1){
+								blue = '0' + blue;
+							}
+							space.style.color = '#'+red+green+blue;
 						}
 					}
 					layerWrapper.appendChild(space);
