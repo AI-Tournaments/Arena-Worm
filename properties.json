@@ -13,18 +13,19 @@
 			"noBorder": false,
 			"threeDimensions": false,
 			"_meta": {
-				"size": {"min": 5, "max": null, "step": 2}
+				"size": {"min": 5, "max": null, "step": 2},
+				"noBorder": {"comment": {"message": "Overrides rules.ticksPerBorderShrink.", "width": "350px"}}
 			}
 		},
 		"rules": {
 			"startLength": 1,
-			"ticksPerShrink": 0,
+			"ticksPerBorderShrink": 0,
 			"apples": ["FourSymmetry", "FourRandom_asymmetric", "RandomOnePerWorm_asymmetric"],
 			"defeatedWorms": ["Solid", "Eatable", "Disappears"],
 			"winner": ["LastWormStanding", "MostPoints"],
 			"_meta": {
 				"startLength": {"min": 1, "max": null, "step": 1},
-				"ticksPerShrink": {"min": -1, "max": null, "step": 1}
+				"ticksPerBorderShrink": {"min": -1, "max": null, "step": 1}
 			}
 		}
 	}
