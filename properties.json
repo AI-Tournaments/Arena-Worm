@@ -25,7 +25,7 @@
 			"winner": ["LastWormStanding", "MostPoints"],
 			"_meta": {
 				"startLength": {"min": 1, "max": null, "step": 1},
-				"movesPerBorderShrink": {"min": -1, "max": null, "step": 1, "comment": {"message": "How many moves the snakes can make before the playable area shrinks.<br>Special values:<br>-1: Disabled, area will not shrink.<br>0: The playable area's current width."}}
+				"movesPerBorderShrink": {"min": -1, "max": null, "step": 1, "comment": {"message": "How many moves the snakes can make before the playable area shrinks.<br>Special values:<br>-1: Disabled, area will not shrink.<br>&nbsp;0: The playable area's current width."}}
 			}
 		}
 	}
