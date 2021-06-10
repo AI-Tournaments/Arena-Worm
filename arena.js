@@ -436,13 +436,13 @@ ArenaHelper.init = (participants, settings) => {
 	}else if(_settings.arena.threeDimensions){
 		ArenaHelper.postAbort('', '`threeDimensions` is currently not supported.');
 	}else{
-		let shrinkSetting = _settings.rules.noBorder ? -1 : _settings.rules.ticksPerBorderShrink;
+		let shrinkSetting = _settings.rules.noBorder ? -1 : _settings.rules.movesPerBorderShrink;
 		if(shrinkSetting < 0){
 			_shrinkOnTick = null;
 		}else if(shrinkSetting === 0){
 			_shrinkOnTick = _settings.arena.size;
 		}else{
-			_shrinkOnTick = _settings.rules.ticksPerBorderShrink;
+			_shrinkOnTick = _settings.rules.movesPerBorderShrink;
 		}
 
 		_arena = [];
