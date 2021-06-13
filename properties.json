@@ -14,7 +14,7 @@
 			"threeDimensions": false,
 			"_meta": {
 				"size": {"min": 5, "max": null, "step": 2},
-				"noBorder": {"comment": {"message": "Disables rules.movesPerBorderShrink.", "width": "350px"}}
+				"noBorder": {"comment": {"message": "Disables rules.movesPerBorderShrink.", "width": "333px"}}
 			}
 		},
 		"rules": {
