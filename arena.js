@@ -98,6 +98,7 @@ class SolidWorm extends Controllable{
 			_worms.splice(this.getWormIndex(), 1);
 			BODY.forEach(part=>{
 				let space = part.getSpace();
+				space.addToGrave(part);
 				if(space !== null){
 					let occupiedBy;
 					switch(_settings.rules.defeatedWorms){
@@ -130,10 +131,13 @@ class Space{
 	static #placedApples = [];
 	static getPlacedApples = ()=>Space.#placedApples.slice();
 	constructor(){
-		const CHALLENGERS = new Array()
+		const CHALLENGERS = new Array();
+		const GRAVE = new Array();
 		let occupiedBy = null;
 		let eatables = 0;
 		let apple = false;
+		this.getGrave = ()=>GRAVE.slice();
+		this.addToGrave = controllable=>GRAVE.push(controllable);
 		function willBeUnoccupied(){
 			return occupiedBy === null ? true : !occupiedBy instanceof Wall && occupiedBy.getLength()-1 === occupiedBy.getPlace();
 		}
@@ -288,7 +292,7 @@ function parseArena(){
 					_occupiedBy.team = occupiedBy.getTeam();
 				}
 			}
-			_column.push({eatables: space.getEatables(), occupiedBy: _occupiedBy});
+			_column.push({eatables: space.getEatables(), occupiedBy: _occupiedBy, grave: space.getGrave()});
 		});
 	});
 	return parsedArena;
