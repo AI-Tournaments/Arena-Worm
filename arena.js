@@ -99,21 +99,21 @@ class SolidWorm extends Controllable{
 			BODY.forEach(part=>{
 				let space = part.getSpace();
 				if(space !== null){
-				let occupiedBy;
-				switch(_settings.rules.defeatedWorms){
-					case 'Solid':
-						occupiedBy = new Wall(space, part);
-						break;
-					case 'Eatable':
-						space.addEatable();
+					let occupiedBy;
+					switch(_settings.rules.defeatedWorms){
+						case 'Solid':
+							occupiedBy = new Wall(space, part);
+							break;
+						case 'Eatable':
+							space.addEatable();
 							if(part.constructor.name === 'SolidWorm'){
 								BODY.filter(b => b.getSpace() === null).forEach(space.addEatable);
 							}
-					case 'Disappears':
-						occupiedBy = null;
-						break;
-				}
-				space.setOccupiedBy(occupiedBy);
+						case 'Disappears':
+							occupiedBy = null;
+							break;
+					}
+					space.setOccupiedBy(occupiedBy);
 				}
 			});
 		};
@@ -148,7 +148,7 @@ class Space{
 			CHALLENGERS.forEach(solidWorm => {
 				if(unoccupied){
 					if(apple){
-						this.setApple(false);
+						this.toggleApple();
 						eatables++;
 					}
 					if(_settings.rules.winner === 'MostPoints'){
@@ -177,7 +177,7 @@ class Space{
 				placeable.setSpace(this);
 			}
 		}
-		this.setApple = ()=>{
+		this.toggleApple = ()=>{
 			if(occupiedBy === null){
 				apple = !Space.#placedApples.includes(this);
 				if(apple){
@@ -301,11 +301,13 @@ function tick(){
 	if(_shrinkOnTick !== null){
 		_ticksSinceShrink++;
 		if(_shrinkOnTick === _ticksSinceShrink){
-			console.log('Shrink!');
 			_ticksSinceShrink = 0;
 			_arena.forEach((column, columnIndex) => {
 				column.forEach((space, rowIndex) => {
 					if(columnIndex === _shrinks || columnIndex === _arena.length-1-_shrinks || rowIndex === _shrinks || rowIndex === _arena.length-1-_shrinks){
+						if(space.getEatables().apple){
+							space.toggleApple();
+						}
 						let occupiedBy = space.getOccupiedBy();
 						if(occupiedBy !== null){
 							switch(occupiedBy.constructor.name){
@@ -316,13 +318,15 @@ function tick(){
 									occupiedBy.getHead().kill();
 									break;
 							}
+						}
+						if(occupiedBy === null || occupiedBy.constructor.name !== 'Wall'){
 							space.setOccupiedBy(new Wall(space, occupiedBy));
 						}
 					}
 				});
 			});
-		_shrinks++;
-	}
+			_shrinks++;
+		}
 	}
 	let retries = 100;
 	switch(_settings.rules.apples){
@@ -330,20 +334,20 @@ function tick(){
 			while(0 < retries && Space.getPlacedApples().length < 4){
 				retries--;
 				Space.getPlacedApples().forEach(space => {
-					space.setApple(false);
+					space.toggleApple();
 				});
 				let short = Math.round(Math.random()*Math.floor(_settings.arena.size/2));
 				let long = Math.round(Math.random()*Math.ceil(_settings.arena.size/2));
-				_arena[short][long].setApple(true);
-				_arena[_settings.arena.size-1-long][short].setApple(true);
-				_arena[long][_settings.arena.size-1-short].setApple(true);
-				_arena[_settings.arena.size-1-short][_settings.arena.size-1-long].setApple(true);
+				_arena[short][long].toggleApple();
+				_arena[_settings.arena.size-1-long][short].toggleApple();
+				_arena[long][_settings.arena.size-1-short].toggleApple();
+				_arena[_settings.arena.size-1-short][_settings.arena.size-1-long].toggleApple();
 			}
 			break;
 		case 'FourRandom_asymmetric':
 			while(0 < retries && Space.getPlacedApples().length < 4){
 				Space.getPlacedApples().forEach(space => {
-					space.setApple(false);
+					space.toggleApple();
 				});
 				if(_arena.flat().filter(space=>space.getOccupiedBy()===null).length < 4){
 					break;
@@ -351,7 +355,7 @@ function tick(){
 				while(Space.getPlacedApples().length < 4){
 					let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
 					let randomSpace = Math.floor(Math.random()*emptySpaces.length);
-					emptySpaces[randomSpace].setApple(true);
+					emptySpaces[randomSpace].toggleApple();
 				}
 			}
 			break;
@@ -360,7 +364,7 @@ function tick(){
 				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
 				if(emptySpaces.length === 0){break;}
 				let randomSpace = Math.floor(Math.random()*emptySpaces.length);
-				emptySpaces[randomSpace].setApple(true);
+				emptySpaces[randomSpace].toggleApple();
 			}
 			break;
 	}
