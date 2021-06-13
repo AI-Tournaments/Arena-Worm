@@ -137,12 +137,8 @@ class Space{
 		function willBeUnoccupied(){
 			return occupiedBy === null ? true : !occupiedBy instanceof Wall && occupiedBy.getLength()-1 === occupiedBy.getPlace();
 		}
-		this.addEatable = ()=>{
-			eatables++;
-		}
-		this.addChallenger = solidWorm=>{
-			CHALLENGERS.push(solidWorm);
-		}
+		this.addEatable = ()=>eatables++;
+		this.addChallenger = solidWorm=>CHALLENGERS.push(solidWorm);
 		this.executeChallenge = ()=>{
 			let unoccupied = willBeUnoccupied();
 			CHALLENGERS.forEach(solidWorm => {
