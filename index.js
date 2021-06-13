@@ -84,7 +84,6 @@ function a(){
 					space.classList.add('space');
 					let spaceData = tick.value[x][y];
 					if(spaceData.eatables.apple || 0 < spaceData.eatables.other){
-						spaceData.eatables.other++;
 						space.classList.add('eatable');
 						if(spaceData.eatables.apple){
 							space.innerHTML = '🍎';
