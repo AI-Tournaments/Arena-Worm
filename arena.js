@@ -320,7 +320,7 @@ function tick(){
 		_shrinks++;
 	}
 	switch(_settings.rules.apples){
-		case 'FourSymmetry': // When one is eaten, all get renewed.
+		case 'FourSymmetry':
 			let retries = 100;
 			while(0 < retries && Space.getPlacedApples().length < 4){
 				retries--;
@@ -335,25 +335,28 @@ function tick(){
 				_arena[_settings.arena.size-1-short][_settings.arena.size-1-long].setApple(true);
 			}
 			break;
-		case 'FourRandom_asymmetric': // When one is eaten, all get renewed.
-			Space.getPlacedApples().forEach(space => {
-				space.setApple(false);
-			});
-			if(_arena.flat().filter(space=>space.getOccupiedBy()===null).length < 4){
-				break;
-			}
-			while(Space.getPlacedApples().length < 4){
-				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
-				let randomSpace = Math.floor(Math.random()*emptySpaces.length);
-				randomSpace.setApple(true);
+		case 'FourRandom_asymmetric':
+			let retries = 100;
+			while(0 < retries && Space.getPlacedApples().length < 4){
+				Space.getPlacedApples().forEach(space => {
+					space.setApple(false);
+				});
+				if(_arena.flat().filter(space=>space.getOccupiedBy()===null).length < 4){
+					break;
+				}
+				while(Space.getPlacedApples().length < 4){
+					let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
+					let randomSpace = Math.floor(Math.random()*emptySpaces.length);
+					emptySpaces[randomSpace].setApple(true);
+				}
 			}
 			break;
-		case 'RandomOnePerWorm_asymmetric': // When one is eaten, only it get renewed.
+		case 'RandomOnePerWorm_asymmetric':
 			while(Space.getPlacedApples().length < _worms.length){
 				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
 				if(emptySpaces.length === 0){break;}
 				let randomSpace = Math.floor(Math.random()*emptySpaces.length);
-				randomSpace.setApple(true);
+				emptySpaces[randomSpace].setApple(true);
 			}
 			break;
 	}
