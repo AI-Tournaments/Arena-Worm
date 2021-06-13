@@ -87,20 +87,19 @@ function a(){
 						space.classList.add('eatable');
 						if(spaceData.eatables.apple){
 							space.innerHTML = '🍎';
-						}
-						if(false && 0 < spaceData.eatables.other){
-							if(spaceData.eatables.apple){
-								space.innerHTML += ', ';
-							}
-							space.innerHTML += spaceData.eatables.other;
+						}else if(0 < spaceData.eatables.other){
+							space.innerHTML = spaceData.eatables.other;
+							space.style.fontStyle = 'italic';
 						}
 					}
 					if(spaceData.occupiedBy !== null){
 						space.classList.add('type-'+spaceData.occupiedBy.type);
 						if(spaceData.occupiedBy.type === 'Wall'){
-							space.innerHTML = spaceData.occupiedBy.origin.team;
-							space.classList.add('origin-type-'+spaceData.occupiedBy.origin.type);
-							space.style.color = getTeamColor(matchLog, spaceData.occupiedBy.origin.team);
+							if(spaceData.occupiedBy.origin){
+								space.innerHTML = spaceData.occupiedBy.origin.team;
+								space.classList.add('origin-type-'+spaceData.occupiedBy.origin.type);
+								space.style.color = getTeamColor(matchLog, spaceData.occupiedBy.origin.team);
+							}
 						}else{
 							space.innerHTML = spaceData.occupiedBy.team;
 							space.classList.add('worm');
