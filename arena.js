@@ -321,12 +321,12 @@ function tick(){
 					}
 				});
 			});
-		}
 		_shrinks++;
 	}
+	}
+	let retries = 100;
 	switch(_settings.rules.apples){
 		case 'FourSymmetry':
-			let retries = 100;
 			while(0 < retries && Space.getPlacedApples().length < 4){
 				retries--;
 				Space.getPlacedApples().forEach(space => {
@@ -341,7 +341,6 @@ function tick(){
 			}
 			break;
 		case 'FourRandom_asymmetric':
-			let retries = 100;
 			while(0 < retries && Space.getPlacedApples().length < 4){
 				Space.getPlacedApples().forEach(space => {
 					space.setApple(false);
