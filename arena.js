@@ -98,6 +98,7 @@ class SolidWorm extends Controllable{
 			_worms.splice(this.getWormIndex(), 1);
 			BODY.forEach(part=>{
 				let space = part.getSpace();
+				if(space !== null){
 				let occupiedBy;
 				switch(_settings.rules.defeatedWorms){
 					case 'Solid':
@@ -105,11 +106,15 @@ class SolidWorm extends Controllable{
 						break;
 					case 'Eatable':
 						space.addEatable();
+							if(part.constructor.name === 'SolidWorm'){
+								BODY.filter(b => b.getSpace() === null).forEach(space.addEatable);
+							}
 					case 'Disappears':
 						occupiedBy = null;
 						break;
 				}
 				space.setOccupiedBy(occupiedBy);
+				}
 			});
 		};
 		this.isAlive = ()=>_worms.includes(this);
