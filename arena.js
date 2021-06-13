@@ -206,7 +206,7 @@ function getPos(solidWorm){
 			}
 		}
 	}
-	ArenaHelper.postAbort('', 'Position not found.');
+	ArenaHelper.postAbort('', 'Position of SolidWorm:'+solidWorm.getTeamNumber()+' not found.');
 }
 function getNextPos(pos, direction){
 	switch(direction){
