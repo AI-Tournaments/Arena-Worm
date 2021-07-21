@@ -2,6 +2,7 @@
 function a(){
 	ReplayHelper.init(matchLog=>{
 		let playStarted = null;
+		let controller = document.getElementById('controller');
 		let slider = document.getElementById('slider');
 		let sliderLayer = document.getElementById('slider-layer');
 		let buttonBack = document.getElementById('step-back');
@@ -19,19 +20,11 @@ function a(){
 			sliderLayer.style.display = undefined;
 		}
 		window.onresize = ()=>{
-			let allSquares = [...document.getElementsByClassName('square')];
 			gameboard.style.zoom = 1;
-			/*let maxWidth = allSquares[0].clientHeight;
-			// Get max
-			for(let square of allSquares){
-				square.style.width = '';
-				maxWidth = Math.max(maxWidth, square.clientWidth);
-			}
-			// Set max
-			for(let square of allSquares){
-				square.style.width = maxWidth + 'px';
-			}*/
-			let zoom = gameboard.parentElement.offsetWidth / gameboard.offsetWidth;
+			let bodyMargin = parseFloat(window.getComputedStyle(document.body, null).getPropertyValue('margin-top'))+parseFloat(window.getComputedStyle(document.body, null).getPropertyValue('margin-bottom'));
+			let wrapperHeight = window.innerHeight - parseFloat(window.getComputedStyle(controller, null).getPropertyValue('height')) - bodyMargin;
+			let wrapperSize = gameboard.parentElement.offsetWidth < wrapperHeight ? gameboard.parentElement.offsetWidth : wrapperHeight;
+			let zoom = wrapperSize / gameboard.offsetWidth;
 			gameboard.style.zoom = zoom;
 		};
 		setTick(0);
