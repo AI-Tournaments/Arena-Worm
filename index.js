@@ -88,11 +88,11 @@ function a(){
 					if(spaceData.occupiedBy !== null){
 						space.classList.add('type-'+spaceData.occupiedBy.type);
 						if(spaceData.occupiedBy.type === 'Wall'){
-							if(spaceData.occupiedBy.origin){
-								space.innerHTML = spaceData.occupiedBy.origin.team;
-								space.classList.add('origin-type-'+spaceData.occupiedBy.origin.type);
-								space.style.color = getTeamColor(matchLog, spaceData.occupiedBy.origin.team);
-							}
+							spaceData.grave.forEach(part => {
+								space.innerHTML = part.team;
+								space.classList.add('type-'+part.type);
+								space.style.color = getTeamColor(matchLog, part.team);
+							});
 						}else{
 							space.innerHTML = spaceData.occupiedBy.team;
 							space.classList.add('worm');
