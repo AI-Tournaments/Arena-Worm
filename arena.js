@@ -33,9 +33,8 @@ class Placeable{
 	}
 }
 class Wall extends Placeable{
-	constructor(space=null, controllable=null){
+	constructor(space=null){
 		super(space);
-		this.getOrigin = ()=>controllable;
 		this.getTeam = ()=>null;
 	}
 }
@@ -103,7 +102,7 @@ class SolidWorm extends Controllable{
 					let occupiedBy;
 					switch(_settings.rules.defeatedWorms){
 						case 'Solid':
-							occupiedBy = new Wall(space, part);
+							occupiedBy = new Wall(space);
 							break;
 						case 'Eatable':
 							space.addEatable();
@@ -136,10 +135,10 @@ class Space{
 		let occupiedBy = null;
 		let eatables = 0;
 		let apple = false;
-		this.getGrave = ()=>GRAVE.slice();
+		this.getGrave = ()=>{return GRAVE.slice()};
 		this.addToGrave = controllable=>GRAVE.push(controllable);
 		function willBeUnoccupied(){
-			return occupiedBy === null ? true : !occupiedBy instanceof Wall && occupiedBy.getLength()-1 === occupiedBy.getPlace();
+			return occupiedBy === null ? true : !(occupiedBy instanceof Wall) && occupiedBy.getLength()-1 === occupiedBy.getPlace();
 		}
 		this.addEatable = ()=>eatables++;
 		this.addChallenger = solidWorm=>CHALLENGERS.push(solidWorm);
@@ -279,20 +278,26 @@ function parseArena(){
 		let _column = [];
 		parsedArena.push(_column);
 		column.forEach(space => {
-			let occupiedBy = space.getOccupiedBy();
-			let _occupiedBy = null;
-			if(occupiedBy !== null){
-				_occupiedBy = {
-					type: occupiedBy.constructor.name
+			let placeable = space.getOccupiedBy();
+			let occupiedBy = null;
+			if(placeable !== null){
+				occupiedBy = {
+					type: placeable.constructor.name
 				};
-				if(occupiedBy instanceof Wall){
-					let origin = occupiedBy.getOrigin();
-					_occupiedBy.origin = origin === null ? null : {team: origin.getTeam(), type: origin.constructor.name};
-				}else{
-					_occupiedBy.team = occupiedBy.getTeam();
+				if(!(placeable instanceof Wall)){
+					occupiedBy.team = placeable.getTeam();
 				}
 			}
-			_column.push({eatables: space.getEatables(), occupiedBy: _occupiedBy, grave: space.getGrave()});
+			_column.push({
+				eatables: space.getEatables(),
+				occupiedBy: occupiedBy,
+				grave: space.getGrave().map(placeable => {
+					return {
+						type: placeable.constructor.name,
+						team: placeable.getTeam()
+					}
+				}
+			)});
 		});
 	});
 	return parsedArena;
