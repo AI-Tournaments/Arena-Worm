@@ -76,6 +76,9 @@ class SolidWorm extends Controllable{
 			BODY.push(new TrailingBody(BODY));
 		}
 		this.move = nextSpace=>{
+			if(_settings.rules.apples === 'AppleLess'){
+				this.extendBody();
+			}
 			this.getWormIndex();
 			let space;
 			BODY.forEach(part=>{
@@ -454,7 +457,7 @@ ArenaHelper.init = (participants, settings) => {
 	}else if(_settings.arena.threeDimensions){
 		ArenaHelper.postAbort('', '`threeDimensions` is currently not supported.');
 	}else{
-		let shrinkSetting = _settings.rules.noBorder ? -1 : _settings.rules.movesPerBorderShrink;
+		let shrinkSetting = _settings.rules.noBorder || _settings.rules.apples === 'AppleLess' ? -1 : _settings.rules.movesPerBorderShrink;
 		if(shrinkSetting < 0){
 			_shrinkOnTick = null;
 		}else if(shrinkSetting === 0){
@@ -494,6 +497,11 @@ ArenaHelper.init = (participants, settings) => {
 		}
 		_worms_lastLength = _worms.length;
 		_worms.forEach(solidWorm => {
+			let startSize = _settings.rules.startLength - 1;
+			while(0 < startSize){
+				startSize--;
+				solidWorm.extendBody();
+			}
 			solidWorm.getParticipant().payload.worm = solidWorm;
 		});
 		tick();
