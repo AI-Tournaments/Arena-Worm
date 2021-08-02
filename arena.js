@@ -439,6 +439,8 @@ function rotateArray(array){
 	return result;
 }
 ArenaHelper.init = (participants, settings) => {
+	console.log('// TODO: Fix no-border.');
+	console.log('// TODO: Fix 3D.');
 	_participants = participants;
 	_settings = settings;
 	if(_participants.countTeams()%2 !== 0){
