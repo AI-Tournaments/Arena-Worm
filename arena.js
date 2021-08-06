@@ -88,7 +88,7 @@ class SolidWorm extends Controllable{
 				}
 				nextSpace = space;
 			});
-			if(space !== null){
+			if(space && space.getOccupiedBy() !== this || this.getLength() === 1){
 				space.setOccupiedBy(null);
 			}
 		}
@@ -385,8 +385,8 @@ function tick(){
 		switch(solidWorm.getTeam()){
 			case 0: rotate = 0; break;
 			case 1: rotate = 2; break;
-			case 2: rotate = 1; break;
-			case 3: rotate = 3; break;
+			case 2: rotate = 3; break;
+			case 3: rotate = 1; break;
 		}
 		for(let i = 0; i < rotate; i++){
 			arenaClone = rotateArray(arenaClone);
