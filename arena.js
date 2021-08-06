@@ -67,7 +67,7 @@ class SolidWorm extends Controllable{
 		this.getWormIndex = ()=>{
 			let index = _worms.indexOf(this);
 			if(index === -1){
-				ArenaHelper.postAbort('', 'SolidWorm is dead.');
+				ArenaHelper.postAbort('', 'SolidWorm not in list.');
 			}
 			return index;
 		}
