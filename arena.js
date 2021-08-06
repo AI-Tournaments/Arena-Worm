@@ -20,6 +20,17 @@ class Direction{
 	static getDown = ()=>this.#DOWN;
 	static getLeft = ()=>this.#LEFT;
 	static getRight = ()=>this.#RIGHT;
+	constructor(){
+		this.getName = ()=>{
+			switch(this){
+				case Direction.getUp(): return 'Up';
+				case Direction.getDown(): return 'Down';
+				case Direction.getLeft(): return 'Left';
+				case Direction.getRight(): return 'Right';
+				default: return undefined;
+			}
+		}
+	}
 }
 class Placeable{
 	constructor(space=null){
