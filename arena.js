@@ -72,14 +72,12 @@ class SolidWorm extends Controllable{
 			return index;
 		}
 		this.extendBody = ()=>{
-			this.getWormIndex();
 			BODY.push(new TrailingBody(BODY));
 		}
 		this.move = nextSpace=>{
 			if(_settings.rules.apples === 'AppleLess'){
 				this.extendBody();
 			}
-			this.getWormIndex();
 			let space;
 			BODY.forEach(part=>{
 				space = part.getSpace();
