@@ -10,11 +10,35 @@
 			:root {
 				--square-size: 20px;
 			}
-			#gamebord-wrapper {
+			#gameboard-wrapper {
 				text-align: center;
 			}
 
-			#gamebord {
+			#score-board-outer-wrapper {
+				height: 100%;
+				width: 100%;
+				top: 0;
+				color: chartreuse;
+				position: fixed;
+			}
+			#score-board-inner-wrapper {
+				display: flex;
+				height: 100%;
+				justify-content: center;
+				align-items: center;
+			}
+			#score-board{
+				border: 1px solid black;
+				background-color: rgba(0,0,0,.9);
+				border-radius: 25px;
+				padding: 15px;
+				text-align: left;
+			}
+			#score-board tr>th:not(:first-child), #score-board tr>td:not(:first-child) {
+				padding-left: 1em;
+			}
+
+			#gameboard {
 				cursor: default;
 				user-select: none;
 				display: inline-block;
@@ -25,6 +49,7 @@
 			#controller {
 				width: 100%;
 				display: flex;
+				position: relative;
 			}
 			#slider, #slider-layer {
 				width: -webkit-fill-available;
@@ -57,8 +82,13 @@
 		<script src="https://ai-tournaments.github.io/AI-Tournaments/ReplayHelper.js"></script>
 	</head>
 	<body onload="a()">
-		<div id="gamebord-wrapper">
-			<div id="gamebord"></div>
+		<div id="gameboard-wrapper">
+			<div id="gameboard"></div>
+			<div id="score-board-outer-wrapper">
+				<div id="score-board-inner-wrapper">
+					<div id="score-board"></div>
+				</div>
+			</div>
 			<div id="controller">
 				<input type="button" id="play" value="❚❚">
 				<input type="button" id="step-back" value="<" disabled>
