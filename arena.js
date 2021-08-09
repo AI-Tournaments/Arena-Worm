@@ -90,16 +90,16 @@ class SolidWorm extends Controllable{
 			if(_settings.rules.apples === 'AppleLess'){
 				this.extendBody();
 			}
-			let space;
+			let lastSpace;
 			BODY.forEach(part=>{
-				space = part.getSpace();
+				lastSpace = part.getSpace();
 				if(nextSpace !== null){
 					nextSpace.setOccupiedBy(part);
 				}
-				nextSpace = space;
+				nextSpace = lastSpace;
 			});
-			if(space && firstSpace !== space){
-				space.setOccupiedBy(null);
+			if(lastSpace && firstSpace !== lastSpace){
+				lastSpace.setOccupiedBy(null);
 			}
 		}
 		this.getParticipant = ()=>{
