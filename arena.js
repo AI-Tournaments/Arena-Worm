@@ -98,7 +98,7 @@ class SolidWorm extends Controllable{
 				}
 				nextSpace = lastSpace;
 			});
-			if(lastSpace && firstSpace !== lastSpace){
+			if(lastSpace && firstSpace !== lastSpace && BODY.includes(lastSpace.getOccupiedBy())){
 				lastSpace.setOccupiedBy(null);
 			}
 		}
