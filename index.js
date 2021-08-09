@@ -8,7 +8,8 @@ function a(){
 		let buttonBack = document.getElementById('step-back');
 		let buttonNext = document.getElementById('step-next');
 		let gameboard = document.getElementById('gameboard');
-		let scoreBoard = document.getElementById('score-board')
+		let scoreBoard = document.getElementById('score-board');
+		let selectMatches = document.getElementById('matches');
 		let play = document.getElementById('play');
 		let _currentMatchIndex;
 		window.onresize = ()=>{
@@ -19,6 +20,54 @@ function a(){
 			let zoom = wrapperSize / gameboard.offsetWidth;
 			gameboard.style.zoom = zoom;
 		};
+		selectMatches.onchange = ()=>{
+			let index = parseInt(selectMatches.selectedOptions[0].dataset.index);
+			_currentMatchIndex = index;
+			let matchLog = arenaResult.matchLogs[_currentMatchIndex];
+			slider.max = matchLog.log.length-1;
+			slider.addEventListener('input', event=>{
+				setTick(slider.valueAsNumber);
+			});
+			if(arenaResult.settings.arena.threeDimensions){
+				sliderLayer.style.display = undefined;
+			}
+			setTick(0);
+			playToggled(undefined, true);
+			function playFrame(){
+				if(play.value !== '▶'){
+					if(250 < Date.now()-playStarted){
+						step({target: buttonNext});
+						playStarted = Date.now();
+					}
+				}
+				window.requestAnimationFrame(playFrame);
+			}
+			playFrame();
+			let scoreBoardString = '';
+			let matchLogErrors = arenaResult.matchLogs.filter(l => l.error);
+			if(matchLogErrors.length){
+				scoreBoardString = '<b style="color: red">Error</b><br>';
+				matchLogErrors.forEach(matchLogError => scoreBoardString += '<div style="color: white">Match '+(arenaResult.matchLogs.findIndex(l => l===matchLogError)+1)+'. '+(matchLogError.participantName?matchLogError.participantName+': ':'')+matchLogError.error+'</div>');
+			}else{
+				scoreBoardString = '<table><tr><th>Team</th><th>Participant</th>';
+				let dataRows = [];
+				arenaResult.matchLogs.forEach((matchLog, index) => {
+					scoreBoardString += '<th>Match '+(index+1)+'</th>';
+					dataRows = [];
+					matchLog.scores.forEach(score => {
+						if(!dataRows[score.team]){
+							dataRows[score.team] = '<tr style="color:'+arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+++'</td><td>'+score.members[0].name+'</td>';
+						}
+						dataRows[score.team] += '<td>'+score.score+'</td>';
+					});
+					arenaResult.result.totalScore.team.forEach((a,index) => {
+						dataRows[index] += '<td>'+arenaResult.result.totalScore.team[index]+'</td><td>'+arenaResult.result.averageScore.team[index]+'</td></tr>';
+					});
+				});
+				scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
+			}
+			scoreBoard.innerHTML = scoreBoardString;
+		}
 		function playToggled(mouseEvent, stop=false){
 			if(stop || play.value !== '▶'){
 				play.value = '▶';
@@ -72,7 +121,7 @@ function a(){
 									let span = document.createElement('span');
 									span.innerHTML = part.team;
 									span.classList.add('type-'+part.type);
-									span.style.color = arenaResult.teamColors[part.team].RGB;
+									span.style.color = arenaResult.teams[part.team].color.RGB;
 									space.appendChild(span);
 								});
 							}else{
@@ -97,61 +146,15 @@ function a(){
 		buttonBack.addEventListener('click', step);
 		buttonNext.addEventListener('click', step);
 		arenaResult.matchLogs.forEach((matchLog, index) => {
-			let input = document.createElement('input');
-			input.type = 'button';
-			input.value = 'Match '+(index+1);
-			controller.appendChild(input);
-			input.onclick = ()=>{
-				_currentMatchIndex = index;
-				slider.max = matchLog.log.length-1;
-				slider.addEventListener('input', event=>{
-					setTick(slider.valueAsNumber);
-				});
-				if(arenaResult.settings.arena.threeDimensions){
-					sliderLayer.style.display = undefined;
-				}
-				setTick(0);
-				playToggled(undefined, true);
-				function playFrame(){
-					if(play.value !== '▶'){
-						if(250 < Date.now()-playStarted){
-							step({target: buttonNext});
-							playStarted = Date.now();
-						}
-					}
-					window.requestAnimationFrame(playFrame);
-				}
-				playFrame();
-				let scoreBoardString = '';
-				let matchLogErrors = arenaResult.matchLogs.filter(l => l.error);
-				if(matchLogErrors.length){
-					scoreBoardString = '<b style="color: red">Error</b><br>';
-					matchLogErrors.forEach(matchLogError => scoreBoardString += '<div style="color: white">Match '+(arenaResult.matchLogs.findIndex(l => l===matchLogError)+1)+'. '+(matchLogError.participantName?matchLogError.participantName+': ':'')+matchLogError.error+'</div>');
-				}else{
-					scoreBoardString = '<table><tr><th>Team</th><th>Participant</th>';
-					let dataRows = [];
-					arenaResult.matchLogs.forEach((matchLog, index) => {
-						scoreBoardString += '<th>Match '+(index+1)+'</th>';
-						dataRows = [];
-						matchLog.scores.forEach(score => {
-							if(!dataRows[score.team]){
-								dataRows[score.team] = '<tr style="color:'+arenaResult.teamColors[score.team].RGB+';"><td>'+score.team+++'</td><td>'+score.members[0].name+'</td>';
-							}
-							dataRows[score.team] += '<td>'+score.score+'</td>';
-						});
-						arenaResult.result.totalScore.team.forEach((a,index) => {
-							dataRows[index] += '<td>'+arenaResult.result.totalScore.team[index]+'</td><td>'+arenaResult.result.averageScore.team[index]+'</td></tr>';
-						});
-					});
-					scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
-				}
-				scoreBoard.innerHTML = scoreBoardString;
-			}
+			let option = document.createElement('option');
+			selectMatches.appendChild(option);
+			option.innerHTML = 'Match '+(index+1);
+			option.dataset.index = index;
 			if(index === 0){
-				input.click();
+				selectMatches.onchange();
 			}
 			if(arenaResult.matchLogs.length === 1){
-				input.style.disabled = 'none';
+				selectMatches.style.disabled = 'none';
 			}
 		});
 	});
