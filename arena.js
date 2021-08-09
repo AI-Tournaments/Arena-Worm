@@ -86,6 +86,7 @@ class SolidWorm extends Controllable{
 			BODY.push(new TrailingBody(BODY));
 		}
 		this.move = nextSpace=>{
+			let firstSpace = nextSpace;
 			if(_settings.rules.apples === 'AppleLess'){
 				this.extendBody();
 			}
@@ -97,7 +98,7 @@ class SolidWorm extends Controllable{
 				}
 				nextSpace = space;
 			});
-			if(space && space.getOccupiedBy() !== this || this.getLength() === 1){
+			if(space && firstSpace !== space){
 				space.setOccupiedBy(null);
 			}
 		}
