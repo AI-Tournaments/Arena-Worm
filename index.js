@@ -56,7 +56,7 @@ function a(){
 					dataRows = [];
 					matchLog.scores.forEach(score => {
 						if(!dataRows[score.team]){
-							dataRows[score.team] = '<tr style="color:'+arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+++'</td><td>'+score.members[0].name+'</td>';
+							dataRows[score.team] = '<tr style="color:'+arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+'</td><td>'+score.members[0].name+'</td>';
 						}
 						dataRows[score.team] += '<td>'+score.score+'</td>';
 					});
