@@ -60,8 +60,8 @@ function a(){
 						dataRows[score.team] += '<td>'+score.score+'</td>';
 					});
 				});
-				arenaResult.result.totalScore.team.forEach((a,index) => {
-					dataRows[index] += '<td>'+arenaResult.result.totalScore.team[index]+'</td><td>'+arenaResult.result.averageScore.team[index]+'</td></tr>';
+				arenaResult.result.team.forEach((r,i) => {
+					dataRows[i] += '<td>'+r.total.score+'</td><td>'+r.average.score+'</td></tr>';
 				});
 				scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
 			}
