@@ -53,19 +53,19 @@ function a(){
 				let dataRows = [];
 				arenaResult.matchLogs.forEach((matchLog, index) => {
 					scoreBoardString += '<th>Match '+(index+1)+'</th>';
-					dataRows = [];
 					matchLog.scores.forEach(score => {
 						if(!dataRows[score.team]){
 							dataRows[score.team] = '<tr style="color:'+arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+'</td><td>'+score.members[0].name+'</td>';
 						}
 						dataRows[score.team] += '<td>'+score.score+'</td>';
 					});
-					arenaResult.result.totalScore.team.forEach((a,index) => {
-						dataRows[index] += '<td>'+arenaResult.result.totalScore.team[index]+'</td><td>'+arenaResult.result.averageScore.team[index]+'</td></tr>';
-					});
+				});
+				arenaResult.result.totalScore.team.forEach((a,index) => {
+					dataRows[index] += '<td>'+arenaResult.result.totalScore.team[index]+'</td><td>'+arenaResult.result.averageScore.team[index]+'</td></tr>';
 				});
 				scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
 			}
+			console.log(scoreBoardString);
 			scoreBoard.innerHTML = scoreBoardString;
 		}
 		function playToggled(mouseEvent, stop=false){
