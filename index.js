@@ -65,7 +65,6 @@ function a(){
 				});
 				scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
 			}
-			console.log(scoreBoardString);
 			scoreBoard.innerHTML = scoreBoardString;
 		}
 		function playToggled(mouseEvent, stop=false){
