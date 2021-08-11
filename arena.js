@@ -377,7 +377,7 @@ function tick(){
 				}
 			}
 			break;
-		case 'RandomOnePerWorm_asymmetric':
+		case 'OneRandomPerWorm_asymmetric':
 			while(Space.getPlacedApples().length < _worms.length){
 				let emptySpaces = _arena.flat().filter(space=>space.getOccupiedBy()===null);
 				if(emptySpaces.length === 0){break;}
