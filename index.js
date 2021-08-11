@@ -46,12 +46,16 @@ function a(){
 			let scoreBoardString = '';
 			let matchLogErrors = arenaResult.matchLogs.filter(l => l.error);
 			if(matchLogErrors.length){
-				scoreBoardString = '<b style="color: red">Error</b><br>';
-				matchLogErrors.forEach(matchLogError => scoreBoardString += '<div style="color: white">Match '+(arenaResult.matchLogs.findIndex(l => l===matchLogError)+1)+'. '+(matchLogError.participantName?matchLogError.participantName+': ':'')+matchLogError.error+'</div>');
-			}else{
-				scoreBoardString = '<table><tr><th>Team</th><th>Participant</th>';
-				let dataRows = [];
-				arenaResult.matchLogs.forEach((matchLog, index) => {
+				scoreBoardString = '<b style="color: red">Aborted</b><br>';
+				matchLogErrors.forEach(matchLogError => scoreBoardString += '<div style="color: white">Match '+(arenaResult.matchLogs.findIndex(l => l===matchLogError)+1)+': '+(matchLogError.participantName?matchLogError.participantName+': ':'')+matchLogError.error+'</div>');
+			}
+			if(arenaResult.result.partialResult){
+				scoreBoardString += '<div style="text-align: center; font-style: italic;">Partial result</div>';
+			}
+			scoreBoardString += '<table><tr><th>Team</th><th>Participant</th>';
+			let dataRows = [];
+			arenaResult.matchLogs.forEach((matchLog, index) => {
+				if(matchLog.scores){
 					scoreBoardString += '<th>Match '+(index+1)+'</th>';
 					matchLog.scores.forEach(score => {
 						if(!dataRows[score.team]){
@@ -59,12 +63,12 @@ function a(){
 						}
 						dataRows[score.team] += '<td>'+score.score+'</td>';
 					});
-				});
-				arenaResult.result.team.forEach((r,i) => {
-					dataRows[i] += '<td>'+r.total.score+'</td><td>'+r.average.score+'</td></tr>';
-				});
-				scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
-			}
+				}
+			});
+			arenaResult.result.team.forEach((r,i) => {
+				dataRows[i] += '<td>'+r.total.score+'</td><td>'+r.average.score+'</td></tr>';
+			});
+			scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
 			scoreBoard.innerHTML = scoreBoardString;
 		}
 		function playToggled(mouseEvent, stop=false){
