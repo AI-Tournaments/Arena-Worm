@@ -235,19 +235,19 @@ function getNextPos(pos, direction){
 			pos = [pos[0]+1, pos[1]];
 			break;
 	}
-	let a = pos[0] < 0;
-	let b = _settings.arena.size <= pos[0];
-	let c = pos[1] < 0;
-	let d = _settings.arena.size <= pos[1];
-	if(a || b || c || d){
+	let xUnder = pos[0] < 0;
+	let xOver = _settings.arena.size <= pos[0];
+	let yUnder = pos[1] < 0;
+	let yOver = _settings.arena.size <= pos[1];
+	if(xUnder || xOver || yUnder || yOver){
 		if(_settings.arena.noBorder){
-			if(a){
+			if(xUnder){
 				pos[0] = _settings.arena.size-1;
-			}else if(b){
+			}else if(xOver){
 				pos[0] = 0;
-			}else if(c){
+			}else if(yUnder){
 				pos[1] = _settings.arena.size-1;
-			}else if(d){
+			}else if(yOver){
 				pos[1] = 0;
 			}
 		}else{
@@ -452,7 +452,6 @@ function rotateArray(array){
 	return result;
 }
 ArenaHelper.init = (participants, settings) => {
-	console.log('// TODO: Fix no-border.');
 	console.log('// TODO: Fix 3D.');
 	_participants = participants;
 	_settings = settings;
@@ -467,7 +466,7 @@ ArenaHelper.init = (participants, settings) => {
 	}else if(_settings.arena.threeDimensions){
 		ArenaHelper.postAbort('', '`threeDimensions` is currently not supported.');
 	}else{
-		let shrinkSetting = _settings.rules.noBorder || _settings.rules.apples === 'AppleLess' ? -1 : _settings.rules.movesPerBorderShrink;
+		let shrinkSetting = _settings.arena.noBorder || _settings.rules.apples === 'AppleLess' ? -1 : _settings.rules.movesPerBorderShrink;
 		if(shrinkSetting < 0){
 			_shrinkOnTick = null;
 		}else if(shrinkSetting === 0){
