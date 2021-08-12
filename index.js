@@ -20,6 +20,9 @@ function a(){
 			let zoom = wrapperSize / gameboard.offsetWidth;
 			gameboard.style.zoom = zoom;
 		};
+		if(arenaResult.matchLogs.length === 1){
+			selectMatches.style.display = 'none';
+		}
 		selectMatches.onchange = ()=>{
 			let index = parseInt(selectMatches.selectedOptions[0].dataset.index);
 			_currentMatchIndex = index;
@@ -49,14 +52,11 @@ function a(){
 				scoreBoardString = '<b style="color: red">Aborted</b><br>';
 				matchLogErrors.forEach(matchLogError => scoreBoardString += '<div style="color: white">Match '+(arenaResult.matchLogs.findIndex(l => l===matchLogError)+1)+': '+(matchLogError.participantName?matchLogError.participantName+': ':'')+matchLogError.error+'</div>');
 			}
-			if(arenaResult.result.partialResult){
-				scoreBoardString += '<div style="text-align: center; font-style: italic;">Partial result</div>';
-			}
-			scoreBoardString += '<table><tr><th>Team</th><th>Participant</th>';
+			scoreBoardString += '<div style="text-align: center; font-style: italic;">'+(arenaResult.result.partialResult?'Partial result':'Result')+'</div><table><tr><th>Team</th><th>Participant</th>';
 			let dataRows = [];
 			arenaResult.matchLogs.forEach((matchLog, index) => {
 				if(matchLog.scores){
-					scoreBoardString += '<th>Match '+(index+1)+'</th>';
+					scoreBoardString += '<th>'+(1<arenaResult.matchLogs.length ? 'Match '+(index+1) : 'Score')+'</th>';
 					matchLog.scores.forEach(score => {
 						if(!dataRows[score.team]){
 							dataRows[score.team] = '<tr style="color:'+arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+'</td><td>'+score.members[0].name+'</td>';
@@ -65,10 +65,17 @@ function a(){
 					});
 				}
 			});
-			arenaResult.result.team.forEach((r,i) => {
-				dataRows[i] += '<td>'+r.total.score+'</td><td>'+r.average.score+'</td></tr>';
-			});
-			scoreBoardString += '<th>Total</th><th>Average</th></tr>'+dataRows.join('')+'</table>';
+			if(1 < arenaResult.matchLogs.length){
+				scoreBoardString += '<th>Total</th><th>Average</th>';
+				arenaResult.result.team.forEach((r,i) => {
+					let average = Math.round(r.average.score*10)/10;
+					if(average%1 === 0){
+						average = ''+average+'.0';
+					}
+					dataRows[i] += '<td>'+r.total.score+'</td><td data-average="'+r.average.score+'">'+average+'</td></tr>';
+				});
+			}
+			scoreBoardString += dataRows.join('')+'</table>';
 			scoreBoard.innerHTML = scoreBoardString;
 		}
 		function playToggled(mouseEvent, stop=false){
