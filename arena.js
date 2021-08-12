@@ -71,7 +71,7 @@ class Controllable extends Placeable{
 	}
 }
 class SolidWorm extends Controllable{
-	constructor(team=null, direction=new Direction()){
+	constructor(team=null, direction=new Direction(), startSize=1){
 		const BODY = new Array();
 		super(BODY);
 		this.direction = direction;
@@ -131,6 +131,11 @@ class SolidWorm extends Controllable{
 			});
 		};
 		this.isAlive = ()=>_worms.includes(this);
+		while(0 < startSize-1){
+			startSize--;
+			this.extendBody();
+		}
+		this.getParticipant().payload.worm = this;
 	}
 }
 class TrailingBody extends Controllable{
@@ -505,14 +510,6 @@ ArenaHelper.init = (participants, settings) => {
 			_worms.push(solidWorm);
 		}
 		_worms_lastLength = _worms.length;
-		_worms.forEach(solidWorm => {
-			let startSize = _settings.rules.startLength - 1;
-			while(0 < startSize){
-				startSize--;
-				solidWorm.extendBody();
-			}
-			solidWorm.getParticipant().payload.worm = solidWorm;
-		});
 		tick();
 	}
 };
