@@ -10,8 +10,16 @@
 			:root {
 				--square-size: 20px;
 			}
-			#gameboard-wrapper {
+			html, body {
+				height: 100%;
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+			body {
+				height: 100%;
+				display: grid;
 				text-align: center;
+				grid-template-rows: auto min-content;
 			}
 
 			#score-board-outer-wrapper {
@@ -42,14 +50,13 @@
 				cursor: default;
 				user-select: none;
 				display: inline-block;
-				border: 1px solid black;
-				background-color: whitesmoke;
 			}
 
 			#controller {
 				width: 100%;
 				display: flex;
 				position: relative;
+				margin-bottom: 8px;
 			}
 			#slider, #slider-layer {
 				width: -webkit-fill-available;
@@ -57,6 +64,11 @@
 
 			.layer {
 				display: grid;
+				border: 1px solid black;
+				background-color: #ffffff07;
+			}
+			.layer:first-child {
+				background-color: whitesmoke;
 			}
 
 			.space {
@@ -77,26 +89,36 @@
 			.type-Wall {
 				background-color: darkgray;
 			}
+
+			#gameboard.threeDimensions {
+				perspective: 350px;
+			}
+			#gameboard.threeDimensions>* {
+				transform-style: preserve-3d;
+			}
 		</style>
 		<script src="index.js"></script>
 		<script src="https://ai-tournaments.github.io/AI-Tournaments/ReplayHelper.js"></script>
 	</head>
 	<body onload="a()">
 		<div id="gameboard-wrapper">
-			<div id="gameboard"></div>
-			<div id="score-board-outer-wrapper">
+			<div id="gameboard">
+				<div id="layer-wrapper"></div>
+			</div>
+			<div id="score-board-outer-wrapper" style="display: none;">
 				<div id="score-board-inner-wrapper">
 					<div id="score-board"></div>
 				</div>
 			</div>
-			<div id="controller">
-				<select id="matches"></select>
-				<input type="button" id="play" value="❚❚">
-				<input type="button" id="step-back" value="<" disabled>
-				<input type="button" id="step-next" value=">">
-				<input type="range" value="0" min="0" id="slider">
-				<input type="range" value="0" min="0" id="slider-layer" style="display: none;">
-			</div>
+		</div>
+		<div id="controller">
+			<select id="matches"></select>
+			<input type="button" id="play" value="❚❚">
+			<input type="button" id="step-back" value="<" disabled>
+			<input type="button" id="step-next" value=">">
+			<input type="range" value="0" min="0" id="slider">
+			<input type="range" value="45" min="0" max="90" id="slider-rotateX" style="display: none;">
+			<input type="range" value="0" min="-180" max="180" id="slider-rotateZ" style="display: none;">
 		</div>
 	</body>
 </html>

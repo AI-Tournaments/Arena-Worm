@@ -4,21 +4,25 @@ function a(){
 		let playStarted = null;
 		let controller = document.getElementById('controller');
 		let slider = document.getElementById('slider');
-		let sliderLayer = document.getElementById('slider-layer');
+		let slider_rotateX = document.getElementById('slider-rotateX');
+		let slider_rotateZ = document.getElementById('slider-rotateZ');
 		let buttonBack = document.getElementById('step-back');
 		let buttonNext = document.getElementById('step-next');
 		let gameboard = document.getElementById('gameboard');
+		let layerWrapper = document.getElementById('layer-wrapper');
 		let scoreBoard = document.getElementById('score-board');
 		let selectMatches = document.getElementById('matches');
 		let play = document.getElementById('play');
 		let _currentMatchIndex;
 		window.onresize = ()=>{
+			gameboard.parentElement.style.margin = '';
 			gameboard.style.zoom = 1;
 			let bodyMargin = parseFloat(window.getComputedStyle(document.body, null).getPropertyValue('margin-top'))+parseFloat(window.getComputedStyle(document.body, null).getPropertyValue('margin-bottom'));
 			let wrapperHeight = window.innerHeight - parseFloat(window.getComputedStyle(controller, null).getPropertyValue('height')) - bodyMargin;
 			let wrapperSize = gameboard.parentElement.offsetWidth < wrapperHeight ? gameboard.parentElement.offsetWidth : wrapperHeight;
 			let zoom = wrapperSize / gameboard.offsetWidth;
-			gameboard.style.zoom = zoom;
+			gameboard.style.zoom = zoom*.5;
+			gameboard.parentElement.style.margin = 'auto';
 		};
 		if(arenaResult.matchLogs.length === 1){
 			selectMatches.style.display = 'none';
@@ -32,7 +36,18 @@ function a(){
 				setTick(slider.valueAsNumber);
 			});
 			if(arenaResult.settings.arena.threeDimensions){
-				sliderLayer.style.display = undefined;
+				function angleChange(){
+					let translateZ = -Math.sin(Math.PI/slider_rotateX.value)*layerWrapper.offsetHeight;
+					let translateY = -Math.cos(Math.PI/slider_rotateX.value)*layerWrapper.offsetHeight;
+					console.log(translateZ);
+					layerWrapper.style.transform = 'rotateX('+slider_rotateX.value+'deg) rotateZ('+slider_rotateZ.value+'deg)';// translateY('+translateY+'px) translateZ('+translateZ+'px)';
+				}
+				slider_rotateX.addEventListener('input', angleChange);
+				slider_rotateZ.addEventListener('input', angleChange);
+				angleChange();
+				slider_rotateX.style.display = 'unset';
+				slider_rotateZ.style.display = 'unset';
+				gameboard.classList.add('threeDimensions');
 			}
 			setTick(0);
 			playToggled(undefined, true);
@@ -101,51 +116,69 @@ function a(){
 				playToggled(undefined, true);
 			}
 			let tick = logIndex < matchLog.log.length ? JSON.parse(JSON.stringify(matchLog.log[logIndex])) : null;
-			while(gameboard.firstChild){
-				gameboard.removeChild(gameboard.lastChild);
+			while(layerWrapper.firstChild){
+				layerWrapper.removeChild(layerWrapper.lastChild);
 			}
 			if(tick){
-				let layerWrapper = document.createElement('div');
-				layerWrapper.classList.add('layer');
-				gameboard.appendChild(layerWrapper);
-				let gridTemplateColumns = '';
-				for(let y = arenaResult.settings.arena.size-1; 0 <= y; y--){
-					gridTemplateColumns += 'auto ';
-					for(let x = 0; x < arenaResult.settings.arena.size; x++){
-						let space = document.createElement('div');
-						space.classList.add('space');
-						let spaceData = tick.value[x][y];
-						if(spaceData.eatables.apple || 0 < spaceData.eatables.other){
-							space.classList.add('eatable');
-							if(spaceData.eatables.apple){
-								space.innerHTML = '🍎';
-							}else if(0 < spaceData.eatables.other){
-								space.innerHTML = spaceData.eatables.other;
-								space.style.fontStyle = 'italic';
+				for(let z = arenaResult.settings.arena.size-1; 0 <= z; z--){
+					let layer = document.createElement('div');
+					layer.classList.add('layer');
+					layerWrapper.appendChild(layer);
+					let gridTemplateColumns = '';
+					for(let y = arenaResult.settings.arena.size-1; 0 <= y; y--){
+						gridTemplateColumns += 'auto ';
+						for(let x = 0; x < arenaResult.settings.arena.size; x++){
+							let space = document.createElement('div');
+							space.classList.add('space');
+							let spaceData = tick.value[z][x][y];
+							if(spaceData.eatables.apple || 0 < spaceData.eatables.other){
+								space.classList.add('eatable');
+								if(spaceData.eatables.apple){
+									space.innerHTML = '🍎';
+								}else if(0 < spaceData.eatables.other){
+									space.innerHTML = spaceData.eatables.other;
+									space.style.fontStyle = 'italic';
+								}
 							}
-						}
-						if(spaceData.occupiedBy !== null){
-							space.classList.add('type-'+spaceData.occupiedBy.type);
-							if(spaceData.occupiedBy.type === 'Wall'){
-								spaceData.grave.forEach(part => {
+							if(spaceData.occupiedBy !== null){
+								space.classList.add('type-'+spaceData.occupiedBy.type);
+								if(spaceData.occupiedBy.type === 'Wall'){
+									spaceData.grave.forEach(part => {
+										let span = document.createElement('span');
+										span.innerHTML = part.team;
+										span.classList.add('type-'+part.type);
+										span.style.color = arenaResult.teams[part.team].color.RGB;
+										space.appendChild(span);
+									});
+								}else{
 									let span = document.createElement('span');
-									span.innerHTML = part.team;
-									span.classList.add('type-'+part.type);
-									span.style.color = arenaResult.teams[part.team].color.RGB;
+									span.innerHTML = spaceData.occupiedBy.team;
+									span.classList.add('worm');
+									span.style.color = arenaResult.teams[spaceData.occupiedBy.team].color.RGB;
 									space.appendChild(span);
-								});
-							}else{
-								let span = document.createElement('span');
-								span.innerHTML = spaceData.occupiedBy.team;
-								span.classList.add('worm');
-								span.style.color = arenaResult.teams[spaceData.occupiedBy.team].color.RGB;
-								space.appendChild(span);
+								}
 							}
+							layer.appendChild(space);
 						}
-						layerWrapper.appendChild(space);
+					}
+					layer.style.gridTemplateColumns = gridTemplateColumns.trim();
+				}
+				function place(){
+					let size = layerWrapper.childNodes[0].offsetHeight;
+					if(0 < size){
+						[...layerWrapper.childNodes].forEach((layer, index) => {
+							if(0 < index){
+								layer.style.marginTop = -size+'px';
+							}
+							let translate = (size/(arenaResult.settings.arena.size-1))*index;
+							translate -= size/2;
+							layer.style.transform = 'translateZ('+translate+'px)';
+						});
+					}else{
+						requestAnimationFrame(place);
 					}
 				}
-				layerWrapper.style.gridTemplateColumns = gridTemplateColumns.trim();
+				place();
 			}
 		}
 		function step(mouseEvent){
