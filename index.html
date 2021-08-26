@@ -64,21 +64,32 @@
 
 			.layer {
 				display: grid;
-				border: 1px solid black;
+				border-width: 0 0 1px 1px;
+				border-style: solid;
+				border-color: rgba(0, 0, 0, .2);
 				background-color: #ffffff07;
+			}
+			.wrapped .layer {
+				border-color: rgba(255, 255, 255, .2);
 			}
 			.layer:first-child {
 				background-color: whitesmoke;
 			}
 
 			.space {
-				border: 1px solid black;
+				border-width: 1px 1px 0 0;
+				border-style: solid;
+				border-color: rgba(0, 0, 0, .2);
 				text-align: center;
 				width: var(--square-size);
 				height: var(--square-size);
 			}
+			.wrapped .layer:not(:first-child) .space {
+				border-color: rgba(255, 255, 255, .2);
+			}
 
 			.eatable {
+				border-radius: 50%;
 				background-color: lightgreen;
 			}
 
@@ -87,11 +98,11 @@
 			}
 
 			.type-Wall {
-				background-color: darkgray;
+				background-color: #0000007f;
 			}
 
 			#gameboard.threeDimensions {
-				perspective: 350px;
+				perspective: 100vmax;
 			}
 			#gameboard.threeDimensions>* {
 				transform-style: preserve-3d;
@@ -105,9 +116,9 @@
 			<div id="gameboard">
 				<div id="layer-wrapper"></div>
 			</div>
-			<div id="score-board-outer-wrapper" style="display: none;">
+			<div id="score-board-outer-wrapper">
 				<div id="score-board-inner-wrapper">
-					<div id="score-board"></div>
+					<div id="score-board" style="display: none"></div>
 				</div>
 			</div>
 		</div>
@@ -117,8 +128,8 @@
 			<input type="button" id="step-back" value="<" disabled>
 			<input type="button" id="step-next" value=">">
 			<input type="range" value="0" min="0" id="slider">
-			<input type="range" value="45" min="0" max="90" id="slider-rotateX" style="display: none;">
-			<input type="range" value="0" min="-180" max="180" id="slider-rotateZ" style="display: none;">
+			<input type="range" value="76" min="0" max="90" id="slider-rotateX" style="display: none;">
+			<input type="range" value="-8" min="-180" max="180" id="slider-rotateZ" style="display: none;">
 		</div>
 	</body>
 </html>

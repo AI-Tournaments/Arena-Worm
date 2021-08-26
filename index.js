@@ -1,6 +1,6 @@
 'use strict'
 function a(){
-	ReplayHelper.init(arenaResult=>{
+	ReplayHelper.init(replay=>{
 		let playStarted = null;
 		let controller = document.getElementById('controller');
 		let slider = document.getElementById('slider');
@@ -14,6 +14,9 @@ function a(){
 		let selectMatches = document.getElementById('matches');
 		let play = document.getElementById('play');
 		let _currentMatchIndex;
+		if(replay.wrapped){
+			layerWrapper.classList.add('wrapped');
+		}
 		window.onresize = ()=>{
 			gameboard.parentElement.style.margin = '';
 			gameboard.style.zoom = 1;
@@ -24,23 +27,24 @@ function a(){
 			gameboard.style.zoom = zoom*.5;
 			gameboard.parentElement.style.margin = 'auto';
 		};
-		if(arenaResult.matchLogs.length === 1){
+		if(replay.arenaResult.matchLogs.length === 1){
 			selectMatches.style.display = 'none';
 		}
 		selectMatches.onchange = ()=>{
 			let index = parseInt(selectMatches.selectedOptions[0].dataset.index);
 			_currentMatchIndex = index;
-			let matchLog = arenaResult.matchLogs[_currentMatchIndex];
+			let matchLog = replay.arenaResult.matchLogs[_currentMatchIndex];
 			slider.max = matchLog.log.length-1;
 			slider.addEventListener('input', event=>{
 				setTick(slider.valueAsNumber);
 			});
-			if(arenaResult.settings.arena.threeDimensions){
+			if(replay.arenaResult.settings.arena.threeDimensions){
 				function angleChange(){
-					let translateZ = -Math.sin(Math.PI/slider_rotateX.value)*layerWrapper.offsetHeight;
-					let translateY = -Math.cos(Math.PI/slider_rotateX.value)*layerWrapper.offsetHeight;
-					console.log(translateZ);
-					layerWrapper.style.transform = 'rotateX('+slider_rotateX.value+'deg) rotateZ('+slider_rotateZ.value+'deg)';// translateY('+translateY+'px) translateZ('+translateZ+'px)';
+					layerWrapper.style.transform = 'rotateX('+slider_rotateX.value+'deg) rotateZ('+slider_rotateZ.value+'deg)';
+				// TODO: Raise space-content up.
+				//	[...document.getElementsByClassName('space-content')].forEach(sc => {
+				//		sc.style.transform = 'rotateX('+-slider_rotateX.value+'deg) rotateZ('+-slider_rotateZ.value+'deg)';
+				//	})
 				}
 				slider_rotateX.addEventListener('input', angleChange);
 				slider_rotateZ.addEventListener('input', angleChange);
@@ -62,27 +66,27 @@ function a(){
 			}
 			playFrame();
 			let scoreBoardString = '';
-			let matchLogErrors = arenaResult.matchLogs.filter(l => l.error);
+			let matchLogErrors = replay.arenaResult.matchLogs.filter(l => l.error);
 			if(matchLogErrors.length){
 				scoreBoardString = '<b style="color: red">Aborted</b><br>';
-				matchLogErrors.forEach(matchLogError => scoreBoardString += '<div style="color: white">Match '+(arenaResult.matchLogs.findIndex(l => l===matchLogError)+1)+': '+(matchLogError.participantName?matchLogError.participantName+': ':'')+matchLogError.error+'</div>');
+				matchLogErrors.forEach(matchLogError => scoreBoardString += '<div style="color: white">Match '+(replay.arenaResult.matchLogs.findIndex(l => l===matchLogError)+1)+': '+(matchLogError.participantName?matchLogError.participantName+': ':'')+matchLogError.error+'</div>');
 			}
-			scoreBoardString += '<div style="text-align: center; font-style: italic;">'+(arenaResult.result.partialResult?'Partial result':'Result')+'</div><table><tr><th>Team</th><th>Participant</th>';
+			scoreBoardString += '<div style="text-align: center; font-style: italic;">'+(replay.arenaResult.result.partialResult?'Partial result':'Result')+'</div><table><tr><th>Team</th><th>Participant</th>';
 			let dataRows = [];
-			arenaResult.matchLogs.forEach((matchLog, index) => {
+			replay.arenaResult.matchLogs.forEach((matchLog, index) => {
 				if(matchLog.scores){
-					scoreBoardString += '<th>'+(1<arenaResult.matchLogs.length ? 'Match '+(index+1) : 'Score')+'</th>';
+					scoreBoardString += '<th>'+(1<replay.arenaResult.matchLogs.length ? 'Match '+(index+1) : 'Score')+'</th>';
 					matchLog.scores.forEach(score => {
 						if(!dataRows[score.team]){
-							dataRows[score.team] = '<tr style="color:'+arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+'</td><td>'+score.members[0].name+'</td>';
+							dataRows[score.team] = '<tr style="color:'+replay.arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+'</td><td>'+score.members[0].name+'</td>';
 						}
 						dataRows[score.team] += '<td>'+score.score+'</td>';
 					});
 				}
 			});
-			if(1 < arenaResult.matchLogs.length){
+			if(1 < replay.arenaResult.matchLogs.length){
 				scoreBoardString += '<th>Total</th><th>Average</th>';
-				arenaResult.result.team.forEach((r,i) => {
+				replay.arenaResult.result.team.forEach((r,i) => {
 					let average = Math.round(r.average.score*10)/10;
 					if(average%1 === 0){
 						average = ''+average+'.0';
@@ -107,7 +111,7 @@ function a(){
 			window.onresize();
 		}
 		function setTick(logIndex=-1){
-			let matchLog = arenaResult.matchLogs[_currentMatchIndex];
+			let matchLog = replay.arenaResult.matchLogs[_currentMatchIndex];
 			let isFinished = slider.valueAsNumber === matchLog.log.length - 1 || matchLog.log.length === 0;
 			buttonBack.disabled = slider.valueAsNumber === 0;
 			buttonNext.disabled = isFinished;
@@ -120,42 +124,48 @@ function a(){
 				layerWrapper.removeChild(layerWrapper.lastChild);
 			}
 			if(tick){
-				for(let z = arenaResult.settings.arena.size-1; 0 <= z; z--){
+				for(let z = replay.arenaResult.settings.arena.size-1; 0 <= z; z--){
 					let layer = document.createElement('div');
 					layer.classList.add('layer');
 					layerWrapper.appendChild(layer);
 					let gridTemplateColumns = '';
-					for(let y = arenaResult.settings.arena.size-1; 0 <= y; y--){
+					for(let y = replay.arenaResult.settings.arena.size-1; 0 <= y; y--){
 						gridTemplateColumns += 'auto ';
-						for(let x = 0; x < arenaResult.settings.arena.size; x++){
+						for(let x = 0; x < replay.arenaResult.settings.arena.size; x++){
 							let space = document.createElement('div');
 							space.classList.add('space');
 							let spaceData = tick.value[z][x][y];
 							if(spaceData.eatables.apple || 0 < spaceData.eatables.other){
-								space.classList.add('eatable');
+								let spaceContent = document.createElement('div');
+								spaceContent.classList.add('space-content');
+								spaceContent.classList.add('eatable');
 								if(spaceData.eatables.apple){
-									space.innerHTML = '🍎';
+									spaceContent.innerHTML = '🍎';
+									space.appendChild(spaceContent);
 								}else if(0 < spaceData.eatables.other){
-									space.innerHTML = spaceData.eatables.other;
-									space.style.fontStyle = 'italic';
+									spaceContent.innerHTML = spaceData.eatables.other;
+									spaceContent.style.fontStyle = 'italic';
+									space.appendChild(spaceContent);
 								}
 							}
 							if(spaceData.occupiedBy !== null){
 								space.classList.add('type-'+spaceData.occupiedBy.type);
 								if(spaceData.occupiedBy.type === 'Wall'){
 									spaceData.grave.forEach(part => {
-										let span = document.createElement('span');
-										span.innerHTML = part.team;
-										span.classList.add('type-'+part.type);
-										span.style.color = arenaResult.teams[part.team].color.RGB;
-										space.appendChild(span);
+										let spaceContent = document.createElement('div');
+										spaceContent.classList.add('space-content');
+										spaceContent.innerHTML = part.team;
+										spaceContent.classList.add('type-'+part.type);
+										spaceContent.style.color = replay.arenaResult.teams[part.team].color.RGB;
+										space.appendChild(spaceContent);
 									});
 								}else{
-									let span = document.createElement('span');
-									span.innerHTML = spaceData.occupiedBy.team;
-									span.classList.add('worm');
-									span.style.color = arenaResult.teams[spaceData.occupiedBy.team].color.RGB;
-									space.appendChild(span);
+									let spaceContent = document.createElement('div');
+									spaceContent.classList.add('space-content');
+									spaceContent.innerHTML = spaceData.occupiedBy.team;
+									spaceContent.classList.add('worm');
+									spaceContent.style.color = replay.arenaResult.teams[spaceData.occupiedBy.team].color.RGB;
+									space.appendChild(spaceContent);
 								}
 							}
 							layer.appendChild(space);
@@ -170,7 +180,7 @@ function a(){
 							if(0 < index){
 								layer.style.marginTop = -size+'px';
 							}
-							let translate = (size/(arenaResult.settings.arena.size-1))*index;
+							let translate = (size/(replay.arenaResult.settings.arena.size-1))*index;
 							translate -= size/2;
 							layer.style.transform = 'translateZ('+translate+'px)';
 						});
@@ -188,7 +198,7 @@ function a(){
 		play.addEventListener('click', playToggled);
 		buttonBack.addEventListener('click', step);
 		buttonNext.addEventListener('click', step);
-		arenaResult.matchLogs.forEach((matchLog, index) => {
+		replay.arenaResult.matchLogs.forEach((matchLog, index) => {
 			let option = document.createElement('option');
 			selectMatches.appendChild(option);
 			option.innerHTML = 'Match '+(index+1);
@@ -196,7 +206,7 @@ function a(){
 			if(index === 0){
 				selectMatches.onchange();
 			}
-			if(arenaResult.matchLogs.length === 1){
+			if(replay.arenaResult.matchLogs.length === 1){
 				selectMatches.style.disabled = 'none';
 			}
 		});
