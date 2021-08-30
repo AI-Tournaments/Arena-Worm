@@ -34,7 +34,8 @@ function a(){
 			let index = parseInt(selectMatches.selectedOptions[0].dataset.index);
 			_currentMatchIndex = index;
 			let matchLog = replay.arenaResult.matchLogs[_currentMatchIndex];
-			slider.max = matchLog.log.length-1;
+			let ticks = matchLog.log.filter(l => l.type === 'tick');
+			slider.max = ticks.length-1;
 			slider.addEventListener('input', event=>{
 				setTick(slider.valueAsNumber);
 			});
@@ -112,14 +113,15 @@ function a(){
 		}
 		function setTick(logIndex=-1){
 			let matchLog = replay.arenaResult.matchLogs[_currentMatchIndex];
-			let isFinished = slider.valueAsNumber === matchLog.log.length - 1 || matchLog.log.length === 0;
+			let ticks = matchLog.log.filter(l => l.type === 'tick');
+			let isFinished = slider.valueAsNumber === ticks.length - 1 || ticks.length === 0;
 			buttonBack.disabled = slider.valueAsNumber === 0;
 			buttonNext.disabled = isFinished;
 			scoreBoard.style.display = isFinished ? '' : 'none';
 			if(isFinished && play.value !== '▶'){
 				playToggled(undefined, true);
 			}
-			let tick = logIndex < matchLog.log.length ? JSON.parse(JSON.stringify(matchLog.log[logIndex])) : null;
+			let tick = logIndex < ticks.length ? JSON.parse(JSON.stringify(ticks[logIndex])) : null;
 			while(layerWrapper.firstChild){
 				layerWrapper.removeChild(layerWrapper.lastChild);
 			}
