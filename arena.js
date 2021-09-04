@@ -468,9 +468,14 @@ function tick(){
 			case 2: rotate = 3; break;
 			case 3: rotate = 1; break;
 			case 4: rotate = -1; break;
-			case 5: rotate = -2; break;
+			case 5: rotate = -3; break;
 		}
 		for(let i = 0; i < rotate; i++){
+			arenaClone.forEach((layer, index) => {
+				arenaClone[index] = rotateArray(layer);
+			});
+		}
+		for(let i = 0; rotate < i; i--){
 			arenaClone = rotateArray(arenaClone);
 		}
 		let participant = solidWorm.getParticipant();
