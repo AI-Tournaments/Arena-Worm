@@ -171,7 +171,6 @@ class Space{
 		this.executeChallenge = ()=>{
 			let unoccupied = willBeUnoccupied();
 			CHALLENGERS.forEach(solidWorm => {
-				if(solidWorm.getTeam() === 2){debugger}
 				if(unoccupied){
 					if(apple){
 						this.toggleApple();
@@ -348,7 +347,6 @@ function updateDirection(participant){
 		}
 	}
 	let solidWorm = participant.payload.worm;
-	if(solidWorm.getTeam() === 2){debugger}
 	solidWorm.direction = rotateDirection(solidWorm, getSelectedDirection(participant.payload.response));
 }
 function parseArena(){
@@ -485,7 +483,6 @@ function tick(){
 		let borderCollisions = [];
 		_worms.forEach(solidWorm => {
 			let pos = getPos(solidWorm);
-			if(solidWorm.getTeam() === 2){debugger}
 			let posNext = getNextPos(pos, solidWorm.direction);
 			if(posNext === null){
 				borderCollisions.push(solidWorm);
