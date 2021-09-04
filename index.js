@@ -42,10 +42,6 @@ function a(){
 			if(replay.arenaResult.settings.arena.threeDimensions){
 				function angleChange(){
 					layerWrapper.style.transform = 'rotateX('+slider_rotateX.value+'deg) rotateZ('+slider_rotateZ.value+'deg)';
-				// TODO: Raise space-content up.
-				//	[...document.getElementsByClassName('space-content')].forEach(sc => {
-				//		sc.style.transform = 'rotateX('+-slider_rotateX.value+'deg) rotateZ('+-slider_rotateZ.value+'deg)';
-				//	})
 				}
 				slider_rotateX.addEventListener('input', angleChange);
 				slider_rotateZ.addEventListener('input', angleChange);
