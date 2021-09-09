@@ -275,7 +275,7 @@ function getNextPos(pos, direction){
 function updateDirection(participant){
 	function getSelectedDirection(response){
 		switch(response){
-			default: debugger; ArenaHelper.log('error', 'SolidWorm:'+solidWorm.getTeam()+' has faulty direction ('+response+'), fallback to forward.');
+			default: return null; // Faulty direction, keep previous.
 			case 'y+': return Directions.FORWARD;
 			case 'y-': return Directions.BACKWARD;
 			case 'x+': return Directions.RIGHT;
@@ -285,24 +285,11 @@ function updateDirection(participant){
 		}
 	}
 	function rotateDirection(solidWorm, direction){
-		let notAllowedDirection;
-		switch(solidWorm.direction){
-			case Directions.FORWARD: notAllowedDirection = Directions.BACKWARD; break;
-			case Directions.BACKWARD: notAllowedDirection = Directions.FORWARD; break;
-			case Directions.RIGHT: notAllowedDirection = Directions.LEFT; break;
-			case Directions.LEFT: notAllowedDirection = Directions.RIGHT; break;
-			case Directions.UP: notAllowedDirection = Directions.DOWN; break;
-			case Directions.DOWN: notAllowedDirection = Directions.UP; break;
-		}
-		if(notAllowedDirection === direction){
-			ArenaHelper.log('error', 'SolidWorm:'+solidWorm.getTeam()+'\'s direction ('+direction+') not allowed, fallback to forward.');
-			direction = Directions.FORWARD;
-		}
 		switch(solidWorm.getTeam()){
 			case 0: return direction;
 			case 1:
 				switch(direction){
-					default: direction;
+					default: return direction;
 					case Directions.FORWARD: return Directions.BACKWARD;
 					case Directions.BACKWARD: return Directions.FORWARD;
 					case Directions.RIGHT: return Directions.LEFT;
@@ -310,7 +297,7 @@ function updateDirection(participant){
 				}
 			case 2:
 				switch(direction){
-					default: direction;
+					default: return direction;
 					case Directions.FORWARD: return Directions.RIGHT;
 					case Directions.BACKWARD: return Directions.LEFT;
 					case Directions.RIGHT: return Directions.BACKWARD;
@@ -318,7 +305,7 @@ function updateDirection(participant){
 				}
 			case 3:
 				switch(direction){
-					default: direction;
+					default: return direction;
 					case Directions.FORWARD: return Directions.LEFT;
 					case Directions.BACKWARD: return Directions.RIGHT;
 					case Directions.RIGHT: return Directions.FORWARD;
@@ -345,9 +332,22 @@ function updateDirection(participant){
 					case Direction.getDown(): return ;
 				}
 		}
+		throw Error('Team not found.');
 	}
 	let solidWorm = participant.payload.worm;
-	solidWorm.direction = rotateDirection(solidWorm, getSelectedDirection(participant.payload.response));
+	let direction = rotateDirection(solidWorm, getSelectedDirection(participant.payload.response));
+	let notAllowedDirection;
+	switch(solidWorm.direction){
+		case Directions.FORWARD: notAllowedDirection = Directions.BACKWARD; break;
+		case Directions.BACKWARD: notAllowedDirection = Directions.FORWARD; break;
+		case Directions.RIGHT: notAllowedDirection = Directions.LEFT; break;
+		case Directions.LEFT: notAllowedDirection = Directions.RIGHT; break;
+		case Directions.UP: notAllowedDirection = Directions.DOWN; break;
+		case Directions.DOWN: notAllowedDirection = Directions.UP; break;
+	}
+	if(direction && notAllowedDirection !== direction){
+		solidWorm.direction = direction;
+	}
 }
 function parseArena(){
 	let parsedArena = [];
@@ -480,7 +480,7 @@ function tick(){
 		}
 		let participant = solidWorm.getParticipant();
 		participant.payload.response = null;
-		participant.postMessage(parsedArena).then(callback);
+		participant.postMessage(arenaClone).then(callback);
 		_participantPromises.push(new Promise(resolve => participant.payload.wormUpdated = resolve));
 	});
 	Promise.all(_participantPromises).then(()=>{
