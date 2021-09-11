@@ -473,7 +473,6 @@ function tick(){
 		}
 		let participant = solidWorm.getParticipant();
 		participant.payload.response = null;
-		if(participant.name=='Temp 3'){console.log('_tick', _tick)}
 		participant.postMessage(arenaClone).then(response => {
 			participant.payload.response = response.data;
 			updateDirection(participant);
