@@ -25,7 +25,13 @@ class Direction{
 const Directions = {'FORWARD': new Direction('Forward'), 'BACKWARD': new Direction('Backward'), 'LEFT': new Direction('Left'), 'RIGHT': new Direction('Right'), 'UP': new Direction('Up'), 'DOWN': new Direction('Down')}
 Object.freeze(Directions);
 class Placeable{
-	constructor(space=null){
+	constructor(space=null, team=null){
+		Object.defineProperty(this, 'team', {
+			value: team,
+			writable: false,
+			enumerable: true,
+			configurable: true
+		});
 		let currentSpace = space;
 		this.getSpace = ()=>{
 			return currentSpace;
@@ -38,13 +44,12 @@ class Placeable{
 class Wall extends Placeable{
 	constructor(space=null){
 		super(space);
-		this.getTeam = ()=>null;
 	}
 }
 class Controllable extends Placeable{
-	constructor(body, space=null){
+	constructor(body, team, space=null){
 		const BODY = body;
-		super(space);
+		super(space, team);
 		if(this.constructor.name === 'Controllable'){
 			ArenaHelper.postAbort('', 'Controllable is not constructable.');
 		}
@@ -57,21 +62,12 @@ class Controllable extends Placeable{
 		this.getLength = () => {
 			return BODY.length;
 		}
-		this.getTeam = ()=>{
-			return BODY[0].team;
-		}
 	}
 }
 class SolidWorm extends Controllable{
 	constructor(direction=new Direction()){
 		const BODY = new Array();
-		super(BODY);
-		Object.defineProperty(this, 'team', {
-			value: _worms.length,
-			writable: false,
-			enumerable: true,
-			configurable: true
-		});
+		super(BODY, _worms.length);
 		this.direction = direction;
 		this.extendBody = ()=>{
 			BODY.push(new TrailingBody(BODY));
@@ -138,7 +134,7 @@ class SolidWorm extends Controllable{
 }
 class TrailingBody extends Controllable{
 	constructor(body){
-		super(body);
+		super(body, body[0].team);
 		this.getHead = ()=>body[0];
 	}
 }
@@ -183,7 +179,7 @@ class Space{
 						eatables++;
 					}
 					if(_settings.rules.winner === 'MostPoints'){
-						_participants.addScore(solidWorm.getTeam(), eatables);
+						_participants.addScore(solidWorm.team, eatables);
 					}
 					if(CHALLENGERS.length === 1){
 						while(0 < eatables){
@@ -286,7 +282,7 @@ function updateDirection(participant){
 		}
 	}
 	function rotateDirection(solidWorm, direction){
-		switch(solidWorm.getTeam()){
+		switch(solidWorm.team){
 			case 1:
 				switch(direction){
 					case Directions.FORWARD: return Directions.BACKWARD;
@@ -356,7 +352,7 @@ function parseArena(){
 						type: placeable.constructor.name
 					};
 					if(!(placeable instanceof Wall)){
-						occupiedBy.team = placeable.getTeam();
+						occupiedBy.team = placeable.team;
 						occupiedBy.isLastTrailingBody = placeable.getLength()-1 === placeable.getPlace();
 					}
 				}
@@ -366,7 +362,7 @@ function parseArena(){
 					grave: space.getGrave().map(placeable => {
 						return {
 							type: placeable.constructor.name,
-							team: placeable.getTeam()
+							team: placeable.team
 						}
 					}
 				)});
@@ -455,7 +451,7 @@ function tick(){
 	_worms.forEach(solidWorm => {
 		let arenaClone = JSON.parse(JSON.stringify(parsedArena));
 		let rotate;
-		switch(solidWorm.getTeam()){
+		switch(solidWorm.team){
 			case 0: rotate = 0; break;
 			case 1: rotate = 2; break;
 			case 2: rotate = 3; break;
@@ -504,7 +500,7 @@ function tick(){
 		});
 		if(_settings.rules.winner === 'LastWormStanding' && _worms_lastLength !== _worms.length){
 			_worms.forEach(solidWorm => {
-				_participants.addScore(solidWorm.getTeam(), 1);
+				_participants.addScore(solidWorm.team, 1);
 			});
 		}
 		_worms_lastLength = _worms.length;
