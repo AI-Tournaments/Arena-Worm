@@ -290,6 +290,7 @@ function updateDirection(participant){
 					case Directions.RIGHT: return Directions.LEFT;
 					case Directions.LEFT: return Directions.RIGHT;
 				}
+				break
 			case 2:
 				switch(direction){
 					case Directions.FORWARD: return Directions.RIGHT;
@@ -297,6 +298,7 @@ function updateDirection(participant){
 					case Directions.RIGHT: return Directions.BACKWARD;
 					case Directions.LEFT: return Directions.FORWARD;
 				}
+				break
 			case 3:
 				switch(direction){
 					case Directions.FORWARD: return Directions.LEFT;
@@ -304,6 +306,7 @@ function updateDirection(participant){
 					case Directions.RIGHT: return Directions.FORWARD;
 					case Directions.LEFT: return Directions.BACKWARD;
 				}
+				break
 			case 4:
 				switch(direction){
 					case Directions.FORWARD: return Directions.DOWN;
@@ -311,6 +314,7 @@ function updateDirection(participant){
 					case Directions.UP: return Directions.FORWARD;
 					case Directions.DOWN: return Directions.BACKWARD;
 				}
+				break
 			case 5:
 				switch(direction){
 					case Directions.FORWARD: return Directions.UP;
@@ -318,6 +322,7 @@ function updateDirection(participant){
 					case Directions.UP: return Directions.BACKWARD;
 					case Directions.DOWN: return Directions.FORWARD;
 				}
+				break
 		}
 		return direction;
 	}
