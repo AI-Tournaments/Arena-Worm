@@ -477,11 +477,10 @@ function tick(){
 		participant.postMessage(arenaClone).then(response => {
 			participant.payload.response = response.data;
 			updateDirection(participant);
-			participant.payload.wormUpdated();
-		});
+		}).finally(()=>participant.payload.wormUpdated());
 		_participantPromises.push(new Promise(resolve => participant.payload.wormUpdated = resolve));
 	});
-	Promise.all(_participantPromises).then(()=>{
+	Promise.allSettled(_participantPromises).then(()=>{
 		let challengedSpaces = [];
 		let borderCollisions = [];
 		_worms.forEach(solidWorm => {
