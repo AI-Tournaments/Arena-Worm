@@ -178,8 +178,8 @@ function a(){
 							if(0 < index){
 								layer.style.marginTop = -size+'px';
 							}
-							let translate = (size/(replay.arenaResult.settings.arena.size-1))*index;
-							translate -= size/2;
+							let translate = -(size/(replay.arenaResult.settings.arena.size-1))*index;
+							translate += size/2;
 							layer.style.transform = 'translateZ('+translate+'px)';
 						});
 					}else{
