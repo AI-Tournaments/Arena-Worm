@@ -309,18 +309,18 @@ function updateDirection(participant){
 				break
 			case 4:
 				switch(direction){
-					case Directions.FORWARD: return Directions.DOWN;
-					case Directions.BACKWARD: return Directions.UP;
-					case Directions.UP: return Directions.FORWARD;
-					case Directions.DOWN: return Directions.BACKWARD;
-				}
-				break
-			case 5:
-				switch(direction){
 					case Directions.FORWARD: return Directions.UP;
 					case Directions.BACKWARD: return Directions.DOWN;
 					case Directions.UP: return Directions.BACKWARD;
 					case Directions.DOWN: return Directions.FORWARD;
+				}
+				break
+			case 5:
+				switch(direction){
+					case Directions.FORWARD: return Directions.DOWN;
+					case Directions.BACKWARD: return Directions.UP;
+					case Directions.UP: return Directions.FORWARD;
+					case Directions.DOWN: return Directions.BACKWARD;
 				}
 				break
 		}
@@ -461,8 +461,8 @@ function tick(){
 			case 1: rotate = 2; break;
 			case 2: rotate = 3; break;
 			case 3: rotate = 1; break;
-			case 4: rotate = -1; break;
-			case 5: rotate = -3; break;
+			case 4: rotate = -3; break;
+			case 5: rotate = -1; break;
 		}
 		for(let i = 0; i < rotate; i++){
 			arenaClone.forEach((layer, index) => {
@@ -471,6 +471,12 @@ function tick(){
 		}
 		for(let i = 0; rotate < i; i--){
 			arenaClone = rotateArray(arenaClone);
+		}
+		if(rotate < 0){
+			arenaClone.reverse().forEach((layer, i) => {
+				arenaClone[i] = rotateArray(layer.reverse());
+			});
+			arenaClone = rotateArray(rotateArray(rotateArray(arenaClone)));
 		}
 		let participant = solidWorm.getParticipant();
 		participant.payload.response = null;
