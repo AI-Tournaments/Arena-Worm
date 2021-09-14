@@ -75,9 +75,9 @@ function a(){
 					scoreBoardString += '<th>'+(1<replay.arenaResult.matchLogs.length ? 'Match '+(index+1) : 'Score')+'</th>';
 					matchLog.scores.forEach(score => {
 						if(!dataRows[score.team]){
-							dataRows[score.team] = '<tr style="color:'+replay.arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+'</td><td>'+score.members[0].name+'</td>';
+							dataRows[score.team] = ['<tr style="color:'+replay.arenaResult.teams[score.team].color.RGB+';"><td>'+score.team+'</td><td>'+score.members[0].name+'</td>', score.score];
 						}
-						dataRows[score.team] += '<td>'+score.score+'</td>';
+						dataRows[score.team][0] += '<td>'+score.score+'</td>';
 					});
 				}
 			});
@@ -88,10 +88,10 @@ function a(){
 					if(average%1 === 0){
 						average = ''+average+'.0';
 					}
-					dataRows[i] += '<td>'+r.total.score+'</td><td data-average="'+r.average.score+'">'+average+'</td></tr>';
+					dataRows[i][0] += '<td>'+r.total.score+'</td><td data-average="'+r.average.score+'">'+average+'</td></tr>';
 				});
 			}
-			scoreBoardString += dataRows.join('')+'</table>';
+			scoreBoardString += dataRows.sort((s1, s2) => s2[1]-s1[1]).map(s => s[0]).join('')+'</table>';
 			scoreBoard.innerHTML = scoreBoardString;
 		}
 		function playToggled(mouseEvent, stop=false){
