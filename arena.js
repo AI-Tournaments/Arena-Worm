@@ -601,13 +601,13 @@ ArenaHelper.init = (participants, settings) => {
 				z: _settings.arena.threeDimensions ? _coordinate_middle : 0
 			},
 			{
-				solidWorm: [Directions.DOWN],
+				solidWorm: [Directions.UP],
 				x: _coordinate_middle,
 				y: _coordinate_middle,
 				z: 0
 			},
 			{
-				solidWorm: [Directions.UP],
+				solidWorm: [Directions.DOWN],
 				x: _coordinate_middle,
 				y: _coordinate_middle,
 				z: _coordinate_end
@@ -618,7 +618,7 @@ ArenaHelper.init = (participants, settings) => {
 				_arena[input.z][input.x][input.y].setOccupiedBy(solidWorm);
 				_worms.push(solidWorm);
 			}
-		})
+		});
 		_worms_lastLength = _worms.length;
 		tick();
 	}
