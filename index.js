@@ -122,7 +122,7 @@ function a(){
 				layerWrapper.removeChild(layerWrapper.lastChild);
 			}
 			if(tick){
-				for(let z = replay.arenaResult.settings.arena.size-1; 0 <= z; z--){
+				for(let z = replay.arenaResult.settings.arena.threeDimensions ? replay.arenaResult.settings.arena.size-1 : 0; 0 <= z; z--){
 					let layer = document.createElement('div');
 					layer.classList.add('layer');
 					layerWrapper.appendChild(layer);
