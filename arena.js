@@ -465,18 +465,20 @@ function tick(){
 			case 5: rotate = -1; break;
 		}
 		for(let i = 0; i < rotate; i++){
-			arenaClone.forEach((layer, index) => {
-				arenaClone[index] = rotateArray(layer);
+			arenaClone.forEach((layer, z) => {
+				arenaClone[z] = rotateArray(layer);
 			});
 		}
 		for(let i = 0; rotate < i; i--){
 			arenaClone = rotateArray(arenaClone);
 		}
 		if(rotate < 0){
-			arenaClone.reverse().forEach((layer, i) => {
-				arenaClone[i] = rotateArray(layer.reverse());
+			arenaClone.reverse().forEach((layer, z) => {
+				arenaClone[z] = rotateArray(layer.reverse());
 			});
-			arenaClone = rotateArray(rotateArray(rotateArray(arenaClone)));
+			for(let i = 0; rotate < i; i--){
+				arenaClone = rotateArray(arenaClone);
+			}
 		}
 		let participant = solidWorm.getParticipant();
 		participant.payload.response = null;
