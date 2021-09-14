@@ -613,7 +613,7 @@ ArenaHelper.init = (participants, settings) => {
 				z: _coordinate_end
 			}
 		].forEach(input => {
-			if(2 < _participants.countTeams() || _settings.arena.threeDimensions && 4 < _participants.countTeams()){
+			if(_worms.length < _participants.countTeams()){
 				let solidWorm = new SolidWorm(...input.solidWorm);
 				_arena[input.z][input.x][input.y].setOccupiedBy(solidWorm);
 				_worms.push(solidWorm);
