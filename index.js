@@ -43,6 +43,32 @@ function a(){
 				function angleChange(){
 					layerWrapper.style.transform = 'rotateX('+slider_rotateX.value+'deg) rotateZ('+slider_rotateZ.value+'deg)';
 				}
+				function updateDragPos(mouseEvent) {
+					if(![slider, slider_rotateX, slider_rotateZ].includes(mouseEvent.srcElement)){
+						dragPos = {x: event.pageX, y: event.pageY};
+					}
+				}
+				document.addEventListener('mousedown', updateDragPos);
+				document.addEventListener('mouseup', () => dragPos = null);
+				document.addEventListener('mousemove', mouseEvent => {
+					if(dragPos){
+						let deltaX = dragPos.x - event.pageX;
+						let deltaY = dragPos.y - event.pageY;
+						updateDragPos(event);
+						slider_rotateX.valueAsNumber += deltaY;
+						slider_rotateZ.valueAsNumber += deltaX;
+						switch(slider_rotateZ.value){
+							case slider_rotateZ.max:
+								slider_rotateZ.value = slider_rotateZ.min;
+								break;
+							case slider_rotateZ.min:
+								slider_rotateZ.value = slider_rotateZ.max;
+								break;
+						}
+						angleChange();
+					}
+				});
+				let dragPos = null;
 				slider_rotateX.addEventListener('input', angleChange);
 				slider_rotateZ.addEventListener('input', angleChange);
 				angleChange();
