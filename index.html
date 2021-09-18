@@ -89,6 +89,9 @@
 				border-color: rgba(255, 255, 255, .2);
 			}
 
+			.space-content:not(.eatable) {
+				height: 0;
+			}
 			.eatable {
 				border-radius: 50%;
 				background-color: lightgreen;
@@ -117,7 +120,7 @@
 			<div id="gameboard">
 				<div id="layer-wrapper"></div>
 			</div>
-			<div id="score-board-outer-wrapper">
+			<div id="score-board-outer-wrapper" style="display: none;">
 				<div id="score-board-inner-wrapper">
 					<div id="score-board" style="display: none"></div>
 				</div>

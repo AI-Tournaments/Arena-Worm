@@ -159,19 +159,6 @@ function a(){
 							let space = document.createElement('div');
 							space.classList.add('space');
 							let spaceData = tick.value[z][x][y];
-							if(spaceData.eatables.apple || 0 < spaceData.eatables.other){
-								let spaceContent = document.createElement('div');
-								spaceContent.classList.add('space-content');
-								spaceContent.classList.add('eatable');
-								if(spaceData.eatables.apple){
-									spaceContent.innerHTML = '🍎';
-									space.appendChild(spaceContent);
-								}else if(0 < spaceData.eatables.other){
-									spaceContent.innerHTML = spaceData.eatables.other;
-									spaceContent.style.fontStyle = 'italic';
-									space.appendChild(spaceContent);
-								}
-							}
 							if(spaceData.occupiedBy !== null){
 								space.classList.add('type-'+spaceData.occupiedBy.type);
 								if(spaceData.occupiedBy.type === 'Wall'){
@@ -191,6 +178,18 @@ function a(){
 									spaceContent.style.color = replay.arenaResult.teams[spaceData.occupiedBy.team].color.RGB;
 									space.appendChild(spaceContent);
 								}
+							}
+							if(spaceData.eatables.apple || 0 < spaceData.eatables.other){
+								let spaceContent = document.createElement('div');
+								spaceContent.classList.add('space-content');
+								spaceContent.classList.add('eatable');
+								if(spaceData.eatables.apple){
+									spaceContent.innerHTML = '🍎';
+								}else{
+									spaceContent.innerHTML = spaceData.eatables.other;
+									spaceContent.style.fontStyle = 'italic';
+								}
+								space.appendChild(spaceContent);
 							}
 							layer.appendChild(space);
 						}
