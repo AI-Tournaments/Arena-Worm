@@ -194,22 +194,24 @@ function a(){
 					});
 					layer.style.gridTemplateColumns = gridTemplateColumns.trim();
 				});
-				function place(){
-					let size = layerWrapper.childNodes[0].offsetHeight;
-					if(0 < size){
-						[...layerWrapper.childNodes].forEach((layer, index) => {
-							if(0 < index){
-								layer.style.marginTop = -size+'px';
-							}
-							let translate = -(size/(replay.arenaResult.settings.arena.size-1))*index;
-							translate += size/2;
-							layer.style.transform = 'translateZ('+translate+'px)';
-						});
-					}else{
-						requestAnimationFrame(place);
+				requestAnimationFrame(()=>{
+					function place(){
+						let size = layerWrapper.childNodes[0].offsetHeight;
+						if(0 < size){
+							[...layerWrapper.childNodes].forEach((layer, index) => {
+								if(0 < index){
+									layer.style.marginTop = -size+'px';
+								}
+								let translate = -(size/(replay.arenaResult.settings.arena.size-1))*index;
+								translate += size/2;
+								layer.style.transform = 'translateZ('+translate+'px)';
+							});
+						}else{
+							requestAnimationFrame(place);
+						}
 					}
-				}
-				place();
+					place();
+				});
 			}
 		}
 		function step(mouseEvent){
