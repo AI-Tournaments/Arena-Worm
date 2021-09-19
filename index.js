@@ -14,9 +14,6 @@ function a(){
 		let selectMatches = document.getElementById('matches');
 		let play = document.getElementById('play');
 		let _currentMatchIndex;
-		if(replay.wrapped){
-			layerWrapper.classList.add('wrapped');
-		}
 		window.onresize = ()=>{
 			gameboard.parentElement.style.margin = '';
 			gameboard.style.zoom = 1;
@@ -149,6 +146,14 @@ function a(){
 				layerWrapper.removeChild(layerWrapper.lastChild);
 			}
 			if(tick){
+				if(replay.arenaResult.settings.arena.threeDimensions){
+					['north', 'south', 'east', 'west'].forEach(side => {
+						let wall = document.createElement('div');
+						wall.id = 'gameboard-wall-'+side;
+						wall.classList.add('gameboard-wall');
+						layerWrapper.appendChild(wall);
+					});
+				}
 				[...tick.value].reverse().forEach(srcLayer => {
 					let layer = document.createElement('div');
 					layer.classList.add('layer');
@@ -197,9 +202,10 @@ function a(){
 				});
 				requestAnimationFrame(()=>{
 					function place(){
-						let size = layerWrapper.childNodes[0].offsetHeight;
+						let layers = layerWrapper.getElementsByClassName('layer');
+						let size = layers[0].offsetHeight;
 						if(0 < size){
-							[...layerWrapper.childNodes].forEach((layer, index) => {
+							[...layers].forEach((layer, index) => {
 								if(0 < index){
 									layer.style.marginTop = -size+'px';
 								}
@@ -207,6 +213,45 @@ function a(){
 								translate += size/2;
 								layer.style.transform = 'translateZ('+translate+'px)';
 							});
+							if(replay.arenaResult.settings.arena.threeDimensions){
+								let translate = -size/2;
+								[
+									{
+										side: 'north',
+										style: [
+											{key: 'height', value: size+'px'},
+											{key: 'width', value: size+'px'},
+											{key: 'transform', value: 'rotateX(-90deg) translateZ('+translate+'px)'}
+										]
+									},{
+										side: 'south',
+										style: [
+											{key: 'height', value: size+'px'},
+											{key: 'width', value: size+'px'},
+											{key: 'transform', value: 'rotateX(90deg) translateZ('+translate+'px)'}
+										]
+									},{
+										side: 'east',
+										style: [
+											{key: 'height', value: size+'px'},
+											{key: 'width', value: size+'px'},
+											{key: 'transform', value: 'rotateX(90deg) rotateY(-90deg) translateZ('+translate+'px)'}
+										]
+									},{
+										side: 'west',
+										style: [
+											{key: 'height', value: size+'px'},
+											{key: 'width', value: size+'px'},
+											{key: 'transform', value: 'rotateX(90deg) rotateY(90deg) translateZ('+translate+'px)'}
+										]
+									}
+								].forEach(w => {
+									let wall = document.getElementById('gameboard-wall-'+w.side);
+									w.style.forEach(style => {
+										wall.style[style.key] = style.value;
+									});
+								});
+							}
 						}else{
 							requestAnimationFrame(place);
 						}

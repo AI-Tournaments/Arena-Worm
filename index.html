@@ -73,8 +73,12 @@
 			.wrapped .layer {
 				border-color: rgba(255, 255, 255, .2);
 			}
-			.layer:last-child {
+			.layer:last-child, .gameboard-wall {
 				background-color: whitesmoke;
+			}
+			.gameboard-wall {
+				position: absolute;
+				backface-visibility: hidden;
 			}
 
 			.space {
@@ -84,9 +88,6 @@
 				text-align: center;
 				width: var(--square-size);
 				height: var(--square-size);
-			}
-			.wrapped .layer:not(:last-child) .space {
-				border-color: rgba(255, 255, 255, .2);
 			}
 
 			.space-content:not(.eatable) {
@@ -136,7 +137,7 @@
 			<input type="button" id="step-next" value=">">
 			<input type="range" value="0" min="0" id="slider">
 			<input type="range" value="76" min="0" max="90" id="slider-rotateX" style="display: none;">
-			<input type="range" value="-8" min="-180" max="180" id="slider-rotateZ" style="display: none;">
+			<input type="range" value="8" min="-180" max="180" id="slider-rotateZ" style="display: none;">
 		</div>
 	</body>
 </html>
