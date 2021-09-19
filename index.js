@@ -37,6 +37,7 @@ function a(){
 			let ticks = matchLog.log.filter(l => l.type === 'tick');
 			slider.max = ticks.length-1;
 			slider.addEventListener('input', event=>{
+				playToggled(undefined, true);
 				setTick(slider.valueAsNumber);
 			});
 			if(replay.arenaResult.settings.arena.threeDimensions){
@@ -219,8 +220,8 @@ function a(){
 			setTick(slider.valueAsNumber);
 		}
 		play.addEventListener('click', playToggled);
-		buttonBack.addEventListener('click', step);
-		buttonNext.addEventListener('click', step);
+		buttonBack.addEventListener('click', mouseEvent => {playToggled(undefined, true); step(mouseEvent);});
+		buttonNext.addEventListener('click', mouseEvent => {playToggled(undefined, true); step(mouseEvent);});
 		replay.arenaResult.matchLogs.forEach((matchLog, index) => {
 			let option = document.createElement('option');
 			selectMatches.appendChild(option);
