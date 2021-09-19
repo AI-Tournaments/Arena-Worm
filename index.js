@@ -159,18 +159,17 @@ function a(){
 							let space = document.createElement('div');
 							space.classList.add('space');
 							let spaceData = tick.value[z][x][y];
+							spaceData.grave.forEach(part => {
+								let spaceContent = document.createElement('div');
+								spaceContent.classList.add('space-content');
+								spaceContent.innerHTML = part.team;
+								spaceContent.classList.add('type-Grave');
+								spaceContent.style.color = replay.arenaResult.teams[part.team].color.RGB;
+								space.appendChild(spaceContent);
+							});
 							if(spaceData.occupiedBy !== null){
 								space.classList.add('type-'+spaceData.occupiedBy.type);
-								if(spaceData.occupiedBy.type === 'Wall'){
-									spaceData.grave.forEach(part => {
-										let spaceContent = document.createElement('div');
-										spaceContent.classList.add('space-content');
-										spaceContent.innerHTML = part.team;
-										spaceContent.classList.add('type-'+part.type);
-										spaceContent.style.color = replay.arenaResult.teams[part.team].color.RGB;
-										space.appendChild(spaceContent);
-									});
-								}else{
+								if(spaceData.occupiedBy.type !== 'Wall'){
 									let spaceContent = document.createElement('div');
 									spaceContent.classList.add('space-content');
 									spaceContent.innerHTML = spaceData.occupiedBy.team;

@@ -104,6 +104,9 @@
 			.type-Wall {
 				background-color: #0000007f;
 			}
+			*:not(.type-Wall)>.type-Grave {
+				filter: grayscale(100%);
+			}
 
 			#gameboard.threeDimensions {
 				perspective: 100vmax;
