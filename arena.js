@@ -165,15 +165,11 @@ class Space{
 		let apple = null;
 		this.getGrave = ()=>{return GRAVE.slice()};
 		this.addToGrave = controllable=>GRAVE.push(controllable);
-		function willBeUnoccupied(){
-			return occupiedBy === null ? true : !(occupiedBy instanceof Wall) && occupiedBy.getLength()-1 === occupiedBy.getPlace();
-		}
 		this.addEatable = ()=>eatables++;
 		this.addChallenger = solidWorm=>CHALLENGERS.push(solidWorm);
-		this.executeChallenge = ()=>{
-			let unoccupied = willBeUnoccupied();
+		this.feedEatables = ()=>{
+			if(CHALLENGERS.length == 1){
 			CHALLENGERS.forEach(solidWorm => {
-				if(unoccupied){
 					if(apple){
 						this.toggleApple();
 						eatables++;
@@ -187,9 +183,20 @@ class Space{
 							solidWorm.extendBody();
 						}
 					}
+				});
+			}else{
+				if(apple){
+					this.toggleApple();
+				}
+			}
+		}
+		this.executeChallenge = ()=>{
+			let willBeUnoccupied = occupiedBy === null ? true : !(occupiedBy instanceof Wall) && occupiedBy.getLength()-1 === occupiedBy.getPlace();
+			CHALLENGERS.forEach(solidWorm => {
+				if(willBeUnoccupied){
 					solidWorm.move(this);
 				}
-				if(1 < CHALLENGERS.length || !unoccupied){
+				if(1 < CHALLENGERS.length || !willBeUnoccupied){
 					solidWorm.kill();
 				}
 			});
@@ -234,6 +241,7 @@ function getPos(solidWorm){
 	ArenaHelper.postAbort('', 'Position of SolidWorm:'+solidWorm.team+' not found.');
 }
 function getNextPos(pos, direction){
+	pos = JSON.parse(JSON.stringify(pos));
 	switch(direction){
 		case Directions.FORWARD: pos.y++; break;
 		case Directions.BACKWARD: pos.y--; break;
@@ -506,6 +514,9 @@ function tick(){
 		});
 		borderCollisions.forEach(solidWorm => {
 			solidWorm.kill();
+		});
+		challengedSpaces.forEach(space => {
+			space.feedEatables();
 		});
 		challengedSpaces.forEach(space => {
 			space.executeChallenge();
