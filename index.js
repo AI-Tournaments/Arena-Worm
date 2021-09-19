@@ -148,17 +148,16 @@ function a(){
 				layerWrapper.removeChild(layerWrapper.lastChild);
 			}
 			if(tick){
-				for(let z = replay.arenaResult.settings.arena.threeDimensions ? replay.arenaResult.settings.arena.size-1 : 0; 0 <= z; z--){
+				[...tick.value].reverse().forEach(srcLayer => {
 					let layer = document.createElement('div');
 					layer.classList.add('layer');
 					layerWrapper.appendChild(layer);
 					let gridTemplateColumns = '';
-					for(let y = replay.arenaResult.settings.arena.size-1; 0 <= y; y--){
+					srcLayer.forEach(srcColumn => {
 						gridTemplateColumns += 'auto ';
-						for(let x = 0; x < replay.arenaResult.settings.arena.size; x++){
+						srcColumn.forEach(spaceData => {
 							let space = document.createElement('div');
 							space.classList.add('space');
-							let spaceData = tick.value[z][x][y];
 							spaceData.grave.forEach(part => {
 								let spaceContent = document.createElement('div');
 								spaceContent.classList.add('space-content');
@@ -191,10 +190,10 @@ function a(){
 								space.appendChild(spaceContent);
 							}
 							layer.appendChild(space);
-						}
-					}
+						});
+					});
 					layer.style.gridTemplateColumns = gridTemplateColumns.trim();
-				}
+				});
 				function place(){
 					let size = layerWrapper.childNodes[0].offsetHeight;
 					if(0 < size){
