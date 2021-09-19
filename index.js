@@ -140,7 +140,7 @@ function a(){
 			let isFinished = slider.valueAsNumber === ticks.length - 1 || ticks.length === 0;
 			buttonBack.disabled = slider.valueAsNumber === 0;
 			buttonNext.disabled = isFinished;
-			scoreBoard.style.display = isFinished ? '' : 'none';
+			scoreBoard.parentElement.parentElement.style.display = isFinished ? '' : 'none';
 			if(isFinished && play.value !== '▶'){
 				playToggled(undefined, true);
 			}
