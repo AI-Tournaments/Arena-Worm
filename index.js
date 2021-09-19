@@ -200,7 +200,7 @@ function a(){
 					});
 					layer.style.gridTemplateColumns = gridTemplateColumns.trim();
 				});
-				requestAnimationFrame(()=>{
+				(()=>{
 					function place(){
 						let layers = layerWrapper.getElementsByClassName('layer');
 						let size = layers[0].offsetHeight;
@@ -257,7 +257,7 @@ function a(){
 						}
 					}
 					place();
-				});
+				})();
 			}
 		}
 		function step(mouseEvent){
