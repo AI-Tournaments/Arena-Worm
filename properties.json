@@ -10,11 +10,12 @@
 	"settings": {
 		"arena": {
 			"size": 15,
-			"noBorder": false,
 			"threeDimensions": false,
 			"_meta": {
-				"size": {"min": 5, "max": null, "step": 2},
-				"noBorder": {"comment": {"message": "Disables rules.movesPerBorderShrink.", "width": "333px"}}
+		"border": {
+			"noBorder": false,
+			"_meta": {
+				"noBorder": {"comment": {"message": "Snakes reappears on the opposite side when traveling through a border. Disables border.movesPerArenaShrink.", "width": "333px"}},
 			}
 		},
 		"rules": {

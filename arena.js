@@ -257,7 +257,7 @@ function getNextPos(pos, direction){
 	let zUnder = pos.z < 0;
 	let zOver = (_settings.arena.threeDimensions ? _settings.arena.size : 1) <= pos.z;
 	if(xUnder || xOver || yUnder || yOver || zUnder || zOver){
-		if(_settings.arena.noBorder){
+		if(_settings.border.noBorder){
 			if(xUnder){
 				pos.x = _settings.arena.size-1;
 			}else if(xOver){
@@ -558,13 +558,13 @@ ArenaHelper.init = (participants, settings) => {
 	}else if(4 < _participants.countTeams() && ['FourSymmetry', 'FourRandom_asymmetric'].includes(_settings.rules.apples)){
 		ArenaHelper.postAbort('', 'Can not play `FourSymmetry` or `FourRandom_asymmetric` with more than 4 participants.');
 	}else{
-		let shrinkSetting = _settings.arena.noBorder || _settings.rules.apples === 'AppleLess' ? -1 : _settings.rules.movesPerBorderShrink;
+		let shrinkSetting = _settings.border.noBorder || _settings.rules.apples === 'AppleLess' ? -1 : _settings.border.movesPerArenaShrink;
 		if(shrinkSetting < 0){
 			_shrinkOnTick = null;
 		}else if(shrinkSetting === 0){
 			_shrinkOnTick = _settings.arena.size;
 		}else{
-			_shrinkOnTick = _settings.rules.movesPerBorderShrink;
+			_shrinkOnTick = _settings.border.movesPerArenaShrink;
 		}
 
 		_arena = [];
