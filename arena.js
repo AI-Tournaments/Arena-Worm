@@ -157,9 +157,15 @@ class Apple{
 	}
 }
 class Space{
-	constructor(){
+	constructor(x, y, z){
 		const CHALLENGERS = new Array();
 		const GRAVE = new Array();
+		Object.defineProperty(this, 'pos', {
+			value: Object.freeze({x: x, y: y, z: z}),
+			writable: false,
+			enumerable: true,
+			configurable: true
+		});
 		let occupiedBy = null;
 		let eatables = 0;
 		let apple = null;
@@ -573,7 +579,7 @@ ArenaHelper.init = (participants, settings) => {
 			while(column.length < _settings.arena.size){
 				let row = [];
 				while(row.length < _settings.arena.size){
-					row.push(new Space());
+					row.push(new Space(column.length, row.length, _arena.length));
 				}
 				column.push(row);
 			}
