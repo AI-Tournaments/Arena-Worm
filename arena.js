@@ -392,34 +392,76 @@ function parseArena(){
 }
 function tick(){
 	if(_shrinkOnTick !== null){
+		function wall(space){
+			if(space.getEatables().apple){
+				space.toggleApple();
+			}
+			let occupiedBy = space.getOccupiedBy();
+			if(occupiedBy !== null){
+				switch(occupiedBy.constructor.name){
+					case 'SolidWorm':
+						occupiedBy.kill();
+						break;
+					case 'TrailingBody':
+						occupiedBy.getHead().kill();
+						break;
+				}
+			}
+			if(occupiedBy === null || occupiedBy.constructor.name !== 'Wall'){
+				space.setOccupiedBy(new Wall(space, occupiedBy));
+			}
+		}
 		_ticksSinceShrink++;
 		if(_shrinkOnTick === _ticksSinceShrink){
 			_ticksSinceShrink = 0;
-			_arena.forEach((height, heightIndex) => {
-				height.forEach((column, columnIndex) => {
-					column.forEach((space, rowIndex) => {
-						if(columnIndex === _shrinks || columnIndex === column.length-1-_shrinks || rowIndex === _shrinks || rowIndex === column.length-1-_shrinks || heightIndex === _shrinks || heightIndex === _arena.length-1-_shrinks){
-							if(space.getEatables().apple){
-								space.toggleApple();
-							}
-							let occupiedBy = space.getOccupiedBy();
-							if(occupiedBy !== null){
-								switch(occupiedBy.constructor.name){
-									case 'SolidWorm':
-										occupiedBy.kill();
-										break;
-									case 'TrailingBody':
-										occupiedBy.getHead().kill();
-										break;
-								}
-							}
-							if(occupiedBy === null || occupiedBy.constructor.name !== 'Wall'){
-								space.setOccupiedBy(new Wall(space, occupiedBy));
-							}
+			let spaces = _arena.flat().flat();
+			switch(_settings.border.shrinkMode){
+				case 'RandomPlacedWall_single':
+					spaces = spaces.filter(space => space.getOccupiedBy()===null);
+					if(spaces.length){
+						let randomSpace = Math.floor(Math.random()*spaces.length);
+						wall(spaces[randomSpace]);
+					}
+					break;
+				case 'RandomPlacedWall_fourSymmetry':
+					let retries = 100;
+					while(0 < retries){
+						retries--;
+						let layer = Math.floor(Math.random()*_arena.length);
+						let short = Math.floor(Math.random()*Math.floor(_settings.arena.size/2));
+						let long = Math.floor(Math.random()*Math.ceil(_settings.arena.size/2));
+						spaces = [
+							_arena[layer][short][long],
+							_arena[layer][_settings.arena.size-1-long][short],
+							_arena[layer][long][_settings.arena.size-1-short],
+							_arena[layer][_settings.arena.size-1-short][_settings.arena.size-1-long]
+						];
+						if(spaces.filter(space => space.getOccupiedBy()===null).length === spaces.length){
+							spaces.forEach(space => {
+								wall(space);
+							});
+							break
+						}
+					}
+					break;
+				case 'RandomPlacedWall_perWorm':
+					_worms.forEach(()=>{
+						spaces = spaces.filter(space => space.getOccupiedBy()===null);
+						if(spaces.length){
+							let randomSpace = Math.floor(Math.random()*spaces.length);
+							wall(spaces[randomSpace]);
 						}
 					});
-				});
-			});
+					break;
+				default:
+				case 'WallOuterArea':
+					spaces.forEach(space => {
+						if(space.pos.x === _shrinks || space.pos.x === _settings.arena.size-1-_shrinks || space.pos.y === _shrinks || space.pos.y === _settings.arena.size-1-_shrinks || space.pos.z === _shrinks || space.pos.z === _arena.length-1-_shrinks){
+							wall(space);
+						}
+					});
+					break;
+			}
 			_shrinks++;
 		}
 	}
@@ -431,9 +473,9 @@ function tick(){
 				Apple.getPlacedApples().forEach(space => {
 					space.toggleApple();
 				});
-				let layer = Math.round(Math.random()*_arena.length);
-				let short = Math.round(Math.random()*Math.floor(_settings.arena.size/2));
-				let long = Math.round(Math.random()*Math.ceil(_settings.arena.size/2));
+				let layer = Math.floor(Math.random()*_arena.length);
+				let short = Math.floor(Math.random()*Math.floor(_settings.arena.size/2));
+				let long = Math.floor(Math.random()*Math.ceil(_settings.arena.size/2));
 				_arena[layer][short][long].toggleApple();
 				_arena[layer][_settings.arena.size-1-long][short].toggleApple();
 				_arena[layer][long][_settings.arena.size-1-short].toggleApple();
@@ -563,6 +605,8 @@ ArenaHelper.init = (participants, settings) => {
 		ArenaHelper.postAbort('', '`threeDimensions` is required for more than 4 participants.');
 	}else if(4 < _participants.countTeams() && ['FourSymmetry', 'FourRandom_asymmetric'].includes(_settings.rules.apples)){
 		ArenaHelper.postAbort('', 'Can not play `FourSymmetry` or `FourRandom_asymmetric` with more than 4 participants.');
+	}else if(4 < _participants.countTeams() && _settings.border.shrinkMode === 'RandomPlacedWall_fourSymmetry'){
+		ArenaHelper.postAbort('', 'RandomPlacedWall_fourSymmetry not symmetric with arena.threeDimensions.');
 	}else{
 		let shrinkSetting = _settings.border.noBorder || _settings.rules.apples === 'AppleLess' ? -1 : _settings.border.movesPerArenaShrink;
 		if(shrinkSetting < 0){
