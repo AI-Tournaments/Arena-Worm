@@ -456,7 +456,7 @@ function tick(){
 				default:
 				case 'WallOuterArea':
 					spaces.forEach(space => {
-						if(space.pos.x === _shrinks || space.pos.x === _settings.arena.size-1-_shrinks || space.pos.y === _shrinks || space.pos.y === _settings.arena.size-1-_shrinks || space.pos.z === _shrinks || space.pos.z === _arena.length-1-_shrinks){
+						if(space.pos.x === _shrinks || space.pos.x === _settings.arena.size-1-_shrinks || space.pos.y === _shrinks || space.pos.y === _settings.arena.size-1-_shrinks || _settings.arena.threeDimensions && (space.pos.z === _shrinks || space.pos.z === _arena.length-1-_shrinks)){
 							wall(space);
 						}
 					});
