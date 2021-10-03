@@ -21,7 +21,7 @@ function a(){
 			let wrapperHeight = window.innerHeight - parseFloat(window.getComputedStyle(controller, null).getPropertyValue('height')) - bodyMargin;
 			let wrapperSize = gameboard.parentElement.offsetWidth < wrapperHeight ? gameboard.parentElement.offsetWidth : wrapperHeight;
 			let zoom = wrapperSize / gameboard.offsetWidth;
-			gameboard.style.zoom = zoom*.5;
+			gameboard.style.zoom = zoom * (replay.arenaResult.settings.arena.threeDimensions ? .5 : .9);
 			gameboard.parentElement.style.margin = 'auto';
 		};
 		if(replay.arenaResult.matchLogs.length === 1){
