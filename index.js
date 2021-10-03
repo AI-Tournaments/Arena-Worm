@@ -159,11 +159,17 @@ function a(){
 					layer.classList.add('layer');
 					layerWrapper.appendChild(layer);
 					let gridTemplateColumns = '';
-					srcLayer.forEach(srcColumn => {
+					srcLayer.forEach((srcColumn, columIndex) => {
 						gridTemplateColumns += 'auto ';
-						srcColumn.forEach(spaceData => {
+						srcColumn.forEach((spaceData, rowIndex) => {
 							let space = document.createElement('div');
 							space.classList.add('space');
+							if(rowIndex === 0){
+								space.classList.add('space-border-left');
+							}
+							if(columIndex === replay.arenaResult.settings.arena.size-1){
+								space.classList.add('space-border-bottom');
+							}
 							spaceData.grave.forEach(part => {
 								let spaceContent = document.createElement('div');
 								spaceContent.classList.add('space-content');
@@ -201,10 +207,12 @@ function a(){
 					layer.style.gridTemplateColumns = gridTemplateColumns.trim();
 				});
 				(()=>{
+					let lastSize = null;
 					function place(){
 						let layers = layerWrapper.getElementsByClassName('layer');
 						let size = layers[0].offsetHeight;
-						if(0 < size){
+						if(size !== lastSize && 0 < size){
+							lastSize = size;
 							[...layers].forEach((layer, index) => {
 								if(0 < index){
 									layer.style.marginTop = -size+'px';
@@ -215,6 +223,7 @@ function a(){
 							});
 							if(replay.arenaResult.settings.arena.threeDimensions){
 								let translate = -size/2;
+								console.log('translate', translate);
 								[
 									{
 										side: 'north',
@@ -252,9 +261,8 @@ function a(){
 									});
 								});
 							}
-						}else{
-							requestAnimationFrame(place);
 						}
+						requestAnimationFrame(place);
 					}
 					place();
 				})();
