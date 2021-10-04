@@ -497,10 +497,13 @@ function tick(){
 				}
 			}
 			break;
+		case 'Single':
 		case 'OneRandomPerWorm_asymmetric':
-			while(Apple.getPlacedApples().length < _worms.length){
+			while(Apple.getPlacedApples().length < (_settings.rules.apples === 'Single' ? 1 : _worms.length)){
 				let emptySpaces = _arena.flat().flat().filter(space=>space.getOccupiedBy()===null);
-				if(emptySpaces.length === 0){break;}
+				if(emptySpaces.length === 0){
+					break;
+				}
 				let randomSpace = Math.floor(Math.random()*emptySpaces.length);
 				emptySpaces[randomSpace].toggleApple();
 			}

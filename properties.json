@@ -27,7 +27,7 @@
 		},
 		"rules": {
 			"startLength": 1,
-			"apples": ["AppleLess", "FourSymmetry", "FourRandom_asymmetric", "OneRandomPerWorm_asymmetric"],
+			"apples": ["AppleLess", "Single", "FourSymmetry", "FourRandom_asymmetric", "OneRandomPerWorm_asymmetric"],
 			"defeatedWorms": ["Disappears", "Eatable", "Solid"],
 			"winner": ["LastWormStanding", "MostPoints"],
 			"_meta": {
