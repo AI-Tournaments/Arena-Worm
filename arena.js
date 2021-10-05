@@ -152,7 +152,7 @@ class Apple{
 			return ID;
 		}
 		this.remove = ()=>{
-			Apple.#placedApples.splice(Apple.#placedApples.indexOf(this), 1);
+			Apple.#placedApples.splice(Apple.#placedApples.indexOf(space), 1);
 		}
 	}
 }
@@ -467,9 +467,12 @@ function tick(){
 	}
 	switch(_settings.rules.apples){
 		case 'FourSymmetry':
+			console.log('space.getEatables().apple');
 			while(0 < retries && Apple.getPlacedApples().length < 4){
 				retries--;
 				Apple.getPlacedApples().forEach(space => {
+					console.log(space.getEatables().apple);
+					debugger
 					space.toggleApple();
 				});
 				let layer = Math.floor(Math.random()*_arena.length);
