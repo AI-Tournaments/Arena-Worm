@@ -174,26 +174,22 @@ class Space{
 		this.addEatable = ()=>eatables++;
 		this.addChallenger = solidWorm=>CHALLENGERS.push(solidWorm);
 		this.feedEatables = ()=>{
-			if(CHALLENGERS.length == 1){
-			CHALLENGERS.forEach(solidWorm => {
-					if(apple){
-						this.toggleApple();
-						eatables++;
-					}
+			if(apple){
+				this.toggleApple();
+				if(CHALLENGERS.length === 1){
+					eatables++;
+				}
+			}
+			if(CHALLENGERS.length === 1){
+				CHALLENGERS.forEach(solidWorm => {
 					if(_settings.rules.winner === 'MostPoints'){
 						_participants.addScore(solidWorm.team, eatables);
 					}
-					if(CHALLENGERS.length === 1){
-						while(0 < eatables){
-							eatables--;
-							solidWorm.extendBody();
-						}
+					while(0 < eatables){
+						eatables--;
+						solidWorm.extendBody();
 					}
 				});
-			}else{
-				if(apple){
-					this.toggleApple();
-				}
 			}
 		}
 		this.executeChallenge = ()=>{
