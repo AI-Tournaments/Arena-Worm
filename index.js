@@ -275,6 +275,13 @@ function a(){
 		play.addEventListener('click', playToggled);
 		buttonBack.addEventListener('click', mouseEvent => {playToggled(undefined, true); step(mouseEvent);});
 		buttonNext.addEventListener('click', mouseEvent => {playToggled(undefined, true); step(mouseEvent);});
+		document.addEventListener('keydown', keyboardEvent => {
+			if(keyboardEvent.code === 'ArrowLeft'){
+				buttonBack.click();
+			}else if(keyboardEvent.code === 'ArrowRight'){
+				buttonNext.click();
+			}
+		});
 		replay.arenaResult.matchLogs.forEach((matchLog, index) => {
 			let option = document.createElement('option');
 			selectMatches.appendChild(option);
