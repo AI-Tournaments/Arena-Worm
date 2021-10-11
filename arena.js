@@ -395,11 +395,10 @@ function tick(){
 			let occupiedBy = space.getOccupiedBy();
 			if(occupiedBy !== null){
 				switch(occupiedBy.constructor.name){
+					case 'TrailingBody':
+						occupiedBy = occupiedBy.getHead();
 					case 'SolidWorm':
 						occupiedBy.kill();
-						break;
-					case 'TrailingBody':
-						occupiedBy.getHead().kill();
 						break;
 				}
 			}
