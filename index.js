@@ -157,6 +157,9 @@ function a(){
 				[...tick.value].reverse().forEach(srcLayer => {
 					let layer = document.createElement('div');
 					layer.classList.add('layer');
+					if(replay.arenaResult.settings.rules.defeatedWorms === 'Solid'){
+						layer.classList.add('defeatedWorms_Solid');
+					}
 					layerWrapper.appendChild(layer);
 					let gridTemplateColumns = '';
 					srcLayer.forEach((srcColumn, columIndex) => {
@@ -173,8 +176,9 @@ function a(){
 							spaceData.grave.forEach(part => {
 								let spaceContent = document.createElement('div');
 								spaceContent.classList.add('space-content');
-								spaceContent.innerHTML = part.team;
 								spaceContent.classList.add('type-Grave');
+								spaceContent.classList.add('type-'+part.type);
+								spaceContent.innerHTML = part.team;
 								spaceContent.style.color = replay.arenaResult.teams[part.team].color.RGB;
 								space.appendChild(spaceContent);
 							});

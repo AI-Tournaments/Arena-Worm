@@ -109,8 +109,11 @@
 			.type-Wall {
 				background-color: #0000007f;
 			}
-			*:not(.type-Wall)>.type-Grave {
+			.type-Grave {
 				filter: grayscale(100%);
+			}
+			.defeatedWorms_Solid .type-Grave {
+				filter: unset;
 			}
 
 			#gameboard.threeDimensions {
