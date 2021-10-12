@@ -57,7 +57,7 @@ class Controllable extends Placeable{
 			BODY.push(this);
 		}
 		Object.defineProperty(this, 'BODY_INDEX', {
-			value: BODY.indexOf(this),
+			value: BODY.length,
 			writable: false,
 			enumerable: true,
 			configurable: true
@@ -111,8 +111,8 @@ class SolidWorm extends Controllable{
 			_worms.splice(this.getWormIndex(), 1);
 			BODY.forEach(part=>{
 				let space = part.getSpace();
-				space.addToGrave(part);
-				if(space !== null){
+				if(space){
+					space.addToGrave(part);
 					let occupiedBy;
 					switch(_settings.rules.defeatedWorms){
 						case 'Solid':
@@ -121,7 +121,7 @@ class SolidWorm extends Controllable{
 						case 'Eatable':
 							space.addEatable();
 							if(part.constructor.name === 'SolidWorm'){
-								BODY.filter(b => b.getSpace() === null).forEach(space.addEatable);
+								BODY.filter(b => !b.getSpace()).forEach(space.addEatable);
 							}
 						case 'Disappears':
 							occupiedBy = null;
