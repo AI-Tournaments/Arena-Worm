@@ -576,7 +576,7 @@ function tick(){
 			});
 		}
 		_worms_lastLength = _worms.length;
-		if(0 < _worms.length){
+		if((_settings.rules.winner === 'LastWormStanding' ? 1 : 0) < _worms.length){
 			tick();
 		}else{
 			ArenaHelper.log('tick', parseArena());
