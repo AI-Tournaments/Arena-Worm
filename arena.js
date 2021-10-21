@@ -596,8 +596,8 @@ function rotateArray(array){
 ArenaHelper.init = (participants, settings) => {
 	_participants = participants;
 	_settings = settings;
-	if(_participants.countTeams()%2 !== 0){
-		ArenaHelper.postAbort('', 'Uneven amount of teams is not supported.');
+	if(_participants.countTeams()%2 !== 0 && !(_settings.rules.winner === 'MostPoints' && _participants.countTeams() === 1)){
+		ArenaHelper.postAbort('', 'Uneven amount of teams is not supported, only MostPoints can be played with a single worm.');
 	}else if(_settings.arena.size%2 !== 1){
 		ArenaHelper.postAbort('', 'Arena size has to be uneven.');
 	}else if(_settings.rules.winner === 'MostPoints' && _settings.rules.defeatedWorms !== 'Solid'){
