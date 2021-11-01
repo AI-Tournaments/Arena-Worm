@@ -28,8 +28,7 @@ function a(){
 			selectMatches.style.display = 'none';
 		}
 		selectMatches.onchange = ()=>{
-			let index = parseInt(selectMatches.selectedOptions[0].dataset.index);
-			_currentMatchIndex = index;
+			_currentMatchIndex = parseInt(selectMatches.selectedOptions[0].dataset.index);
 			let matchLog = replay.arenaResult.matchLogs[_currentMatchIndex];
 			let ticks = matchLog.log.filter(l => l.type === 'tick');
 			slider.max = ticks.length-1;
