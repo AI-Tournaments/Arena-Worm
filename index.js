@@ -226,7 +226,6 @@ function a(){
 							});
 							if(replay.arenaResult.settings.arena.threeDimensions){
 								let translate = -size/2;
-								console.log('translate', translate);
 								[
 									{
 										side: 'north',
