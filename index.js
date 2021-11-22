@@ -1,5 +1,13 @@
 'use strict'
 function a(){
+	function rotateArray(array){
+		let result = [];
+		for(let i = array[0].length-1; 0 <= i; i--){
+			let row = array.map(e => e[i]).reverse();
+			result.push(row);
+		}
+		return result;
+	}
 	ReplayHelper.init(replay=>{
 		let playStarted = null;
 		let controller = document.getElementById('controller');
@@ -161,7 +169,7 @@ function a(){
 					}
 					layerWrapper.appendChild(layer);
 					let gridTemplateColumns = '';
-					srcLayer.forEach((srcColumn, columIndex) => {
+					rotateArray(srcLayer).forEach((srcColumn, columIndex) => {
 						gridTemplateColumns += 'auto ';
 						srcColumn.forEach((spaceData, rowIndex) => {
 							let space = document.createElement('div');
