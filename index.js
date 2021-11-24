@@ -3,7 +3,7 @@ function a(){
 	function rotateArray(array){
 		let result = [];
 		for(let i = array[0].length-1; 0 <= i; i--){
-			let row = array.map(e => e[i]).reverse();
+			let row = array.map(e => e[i]);
 			result.push(row);
 		}
 		return result;
