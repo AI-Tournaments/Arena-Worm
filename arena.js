@@ -482,16 +482,25 @@ function tick(){
 				_arena[layer][long][_settings.arena.size-1-short].toggleApple();
 				_arena[layer][_settings.arena.size-1-short][_settings.arena.size-1-long].toggleApple();
 			}
+			if(Apple.getPlacedApples().length < 4){
+				Apple.getPlacedApples().forEach(space => {
+					space.toggleApple();
+				});
+			}
 			break;
 		case 'FourRandom_asymmetric':
-			while(0 < retries && Apple.getPlacedApples().length < 4){
+			if(Apple.getPlacedApples().length < 4){
 				Apple.getPlacedApples().forEach(space => {
 					space.toggleApple();
 				});
 				while(Apple.getPlacedApples().length < 4){
 					let emptySpaces = getEmptySpaces();
-					let randomSpace = Math.floor(Math.random()*emptySpaces.length);
-					emptySpaces[randomSpace].toggleApple();
+					if(emptySpaces.length){
+						let randomSpace = Math.floor(Math.random()*emptySpaces.length);
+						emptySpaces[randomSpace].toggleApple();
+					}else{
+						break;
+					}
 				}
 			}
 			break;
@@ -499,11 +508,12 @@ function tick(){
 		case 'OneRandomPerWorm_asymmetric':
 			while(Apple.getPlacedApples().length < (_settings.rules.apples === 'Single' ? 1 : _worms.length)){
 				let emptySpaces = getEmptySpaces();
-				if(emptySpaces.length === 0){
+				if(emptySpaces.length){
+					let randomSpace = Math.floor(Math.random()*emptySpaces.length);
+					emptySpaces[randomSpace].toggleApple();
+				}else{
 					break;
 				}
-				let randomSpace = Math.floor(Math.random()*emptySpaces.length);
-				emptySpaces[randomSpace].toggleApple();
 			}
 			break;
 	}
