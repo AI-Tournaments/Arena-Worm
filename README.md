@@ -22,7 +22,7 @@ Note that `eatables.apple` can either be `null` or a number. The number only rep
 | --- | --- |---|
 | `arena` | `size` | Defines the size (length of each side) of the arena. |
 | `arena` | `threeDimensions` | If enable the size of the arena is `size*size*size` instead of `size*size`. |
-| `border` | `noBorder` | If enable the worm will appear of the opposite side of the arena instead of colliding with a wall. |
+| `border` | `noOuterBorder` | If enable the worm will appear of the opposite side of the arena instead of colliding with a wall. |
 | `border` | `movesPerArenaShrink` | How many moves a worm can make before the arena shrinks. |
 | `border` | `shrinkMode` | • `RandomPlacedWall_single`<br>A random wall is placed anywhere on the arena. <br>• `RandomPlacedWall_fourSymmetry`<br>Four walls are placed symmetrically on the arena. <br>• `RandomPlacedWall_perWorm`<br>One random wall pere living worm is placed anywhere on the arena. <br>• `WallOuterArea`<br>Playable arena shrinks my placing a wall on the most outer sides. |
 | `rules` | `startLength` | How long the worm will start as. |

@@ -262,7 +262,7 @@ function getNextPos(pos, direction){
 	let zUnder = pos.z < 0;
 	let zOver = (_settings.arena.threeDimensions ? _settings.arena.size : 1) <= pos.z;
 	if(xUnder || xOver || yUnder || yOver || zUnder || zOver){
-		if(_settings.border.noBorder){
+		if(_settings.border.noOuterBorder){
 			if(xUnder){
 				pos.x = _settings.arena.size-1;
 			}else if(xOver){
@@ -618,8 +618,10 @@ ArenaHelper.init = (participants, settings) => {
 		ArenaHelper.postAbort('', 'Can not play `FourSymmetry` or `FourRandom_asymmetric` with more than 4 participants.');
 	}else if(4 < _participants.countTeams() && _settings.border.shrinkMode === 'RandomPlacedWall_fourSymmetry'){
 		ArenaHelper.postAbort('', 'RandomPlacedWall_fourSymmetry not symmetric with arena.threeDimensions.');
+	}else if(_settings.border.shrinkMode === 'WallOuterArea' && _settings.border.noOuterBorder){
+		ArenaHelper.postAbort('', 'WallOuterArea is not compatible with noOuterBorder.');
 	}else{
-		let shrinkSetting = _settings.border.noBorder || _settings.rules.apples === 'AppleLess' ? -1 : _settings.border.movesPerArenaShrink;
+		let shrinkSetting = _settings.rules.apples === 'AppleLess' ? -1 : _settings.border.movesPerArenaShrink;
 		if(shrinkSetting < 0){
 			_shrinkOnTick = null;
 		}else if(shrinkSetting === 0){
