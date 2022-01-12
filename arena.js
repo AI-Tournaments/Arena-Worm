@@ -589,6 +589,35 @@ function tick(){
 		if((_settings.rules.winner === 'LastWormStanding' ? 1 : 0) < _worms.length){
 			tick();
 		}else{
+			if(_settings.rules.winner === 'LastWormStanding' && _settings.rules.bonusToLonger){
+				let list = [];
+				let maxLength = -1;
+				while(list.length < _participants.countTeams()){
+					let participant = _participants.get(list.length, 0);
+					let wormLength = participant.payload.worm.getLength();
+					maxLength = Math.max(maxLength, wormLength);
+					list.push({
+						participant: participant,
+						wormLength: wormLength,
+						score: null
+					});
+				}
+				maxLength *= 10;
+				_participants.getScores().forEach(s => {
+					list[s.team].score = s.score;
+				});
+				let bonusPoint = 0;
+				let lastScore = null;
+				let lastLength = null;
+				list.sort((s1, s2) => (s1.score - s2.score)*maxLength + (s1.wormLength - s2.wormLength)).forEach(s => {
+					if(lastScore === s.score && lastLength != s.wormLength){
+						bonusPoint++;
+					}
+					s.participant.addScore(bonusPoint);
+					lastScore = s.score;
+					lastLength = s.wormLength;
+				});
+			}
 			ArenaHelper.log('tick', parseArena());
 			ArenaHelper.postDone();
 		}

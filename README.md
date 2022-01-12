@@ -29,5 +29,6 @@ Note that `eatables.apple` can either be `null` or a number. The number only rep
 | `rules` | `apples` | How many apples is located at the arena and how they are placed. |
 | `rules` | `defeatedWorms` | What will happen to a defeated worm.<br>• `Disappears`<br>Defeated worms are removed.<br>• `Eatable`<br>Defeated worms becomes eatable for extra points.<br>• `Solid`<br>Defeated worms turns into a wall. |
 | `rules` | `winner` | • `LastWormStanding`<br>Participants that are alive receive one point each time a worm is defeated. <br>• `MostPoints`<br>Participants receive one point for every eaten object until there is no more worms alive.|
+| `rules` | `bonusToLonger` | If two worms score equal, bonus point is dealt to the longer worm. |
 
 To keep the challenge for all worms to be symmetric and equal, make sure to keep the amount of teams to an even number.
