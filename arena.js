@@ -550,8 +550,10 @@ function tick(){
 		let participant = solidWorm.getParticipant();
 		participant.payload.response = null;
 		participant.postMessage(arenaClone).then(response => {
-			participant.payload.response = response.message.data;
-			updateDirection(participant);
+			if(response.message){
+				participant.payload.response = response.message.data;
+				updateDirection(participant);
+			}
 		}).finally(()=>participant.payload.wormUpdated());
 		_participantPromises.push(new Promise(resolve => participant.payload.wormUpdated = resolve));
 	});
