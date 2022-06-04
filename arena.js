@@ -554,7 +554,8 @@ function tick(){
 				participant.payload.response = response.message.data;
 				updateDirection(participant);
 			}
-		}).finally(()=>participant.payload.wormUpdated());
+			participant.payload.wormUpdated();
+		});
 		_participantPromises.push(new Promise(resolve => participant.payload.wormUpdated = resolve));
 	});
 	Promise.allSettled(_participantPromises).then(()=>{
