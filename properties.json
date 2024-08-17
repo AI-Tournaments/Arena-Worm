@@ -5,7 +5,7 @@
 			"teams": {"min": 2, "max": 6},
 			"participantsPerTeam": {"min": 1, "max": 1}
 		},
-		"replay": "/Worm-Arena/replay/"
+		"replay": "/Arena-Worm/replay/"
 	},
 	"settings": {
 		"arena": {
